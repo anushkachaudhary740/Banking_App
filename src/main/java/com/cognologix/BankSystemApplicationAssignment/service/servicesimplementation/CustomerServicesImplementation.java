@@ -1,0 +1,67 @@
+package com.cognologix.BankSystemApplicationAssignment.service.servicesimplementation;
+import com.cognologix.BankSystemApplicationAssignment.converter.AccountConverter;
+import com.cognologix.BankSystemApplicationAssignment.converter.CustomerConverter;
+import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
+import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
+import com.cognologix.BankSystemApplicationAssignment.model.Customer;
+import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
+import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+@Service
+public class CustomerServicesImplementation implements CustomerServices {
+    public CustomerServicesImplementation(CustomerRepo customerRepo) {
+        this.customerRepo = customerRepo;
+    }
+
+    @Autowired
+    private CustomerRepo customerRepo;
+    @Autowired
+    private AccountConverter accountConverter;
+    @Autowired
+   private CustomerConverter customerConverter;
+    Random random=new Random();
+    @Override
+    public CustomerDto createNewCustomer(CustomerDto customerDto) {
+        Customer customerDetails = this.customerConverter.dtoToModel(customerDto);
+        this.customerRepo.save(customerDetails);
+//        Account account=new Account();
+//        account.setCustomerId(customerDto.getCustomerId());
+//        account.setAccountNumber(account.getAccountNumber());
+//        account.setBankName(customerDto.getBankName());
+//        account.setAccountHolderName(customerDto.getCustomerName());
+//        account.setTypeOfAccount(customerDto.getTypeOfAccount());
+//        account.setTypeOfAccount(customerDto.getTypeOfAccount());
+//        account.setTotalAmount(0.0);
+        return this.customerConverter.modelToDto(customerDetails);
+    }
+    @Override
+    public CustomerDto getCustomerById(Integer customerId) {
+        Customer customer=this.customerRepo.findById(customerId).orElseThrow(()->new ResourceNotFoundException("Customer","Id",customerId));
+        return this.customerConverter.modelToDto(customer);
+
+    }
+    @Override
+    public List<CustomerDto> findAllCustomerDetails() {
+        List<Customer> list=this.customerRepo.findAll();
+        List<CustomerDto> cusDtos =list.stream().map(e-> this.customerConverter.modelToDto(e))
+                .collect(Collectors.toList());
+        return cusDtos;
+    }
+    @Override
+    public void updateCustomerDetails(CustomerDto customerDto, Integer customerId) {
+        Customer customerDetails = this.customerConverter.dtoToModel(customerDto);
+        customerDetails.setCustomerId(customerId);
+        this.customerRepo.save(customerDetails);
+        this.customerConverter.modelToDto(customerDetails);
+    }
+    @Override
+    public void deleteCustomer(Integer customerId) {
+        this.customerRepo.deleteById(customerId);
+    }
+
+}
