@@ -22,6 +22,7 @@ public class AccountServicesImplementation implements AccountServices {
     
     @Override
     public List<AccountDto> getAccountDetails() {
+
         List<Account> list=this.accountRepo.findAll();
         List<AccountDto> accDtos =list.stream().map(e-> this.accountConverter.modelToDto(e))
                 .collect(Collectors.toList());
@@ -34,7 +35,10 @@ public class AccountServicesImplementation implements AccountServices {
     }
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
+        Integer accNum=1000000000;
+        accountDto.setAccountNumber(accountDto.getAccountNumber()+accNum);
         Account accountDetails = this.accountConverter.dtoToModel(accountDto);
+
         Account acc = this.accountRepo.save(accountDetails);
         return this.accountConverter.modelToDto(acc);
     }

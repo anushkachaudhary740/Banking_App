@@ -9,6 +9,7 @@ import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoun
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -40,9 +41,9 @@ public class CustomerServicesImplementation implements CustomerServices {
         return this.customerConverter.modelToDto(customerDetails);
     }
     @Override
-    public CustomerDto getCustomerById(Integer customerId) {
+    public Optional<CustomerDto> getCustomerById(Integer customerId) {
         Customer customer=this.customerRepo.findById(customerId).orElseThrow(()->new ResourceNotFoundException("Customer","Id",customerId));
-        return this.customerConverter.modelToDto(customer);
+        return Optional.ofNullable(this.customerConverter.modelToDto(customer));
 
     }
     @Override
@@ -53,11 +54,12 @@ public class CustomerServicesImplementation implements CustomerServices {
         return cusDtos;
     }
     @Override
-    public void updateCustomerDetails(CustomerDto customerDto, Integer customerId) {
+    public CustomerDto updateCustomerDetails(CustomerDto customerDto) {
         Customer customerDetails = this.customerConverter.dtoToModel(customerDto);
-        customerDetails.setCustomerId(customerId);
+        //customerDetails.setCustomerId(customerId);
         this.customerRepo.save(customerDetails);
-        this.customerConverter.modelToDto(customerDetails);
+        return this.customerConverter.modelToDto(customerDetails);
+
     }
     @Override
     public void deleteCustomer(Integer customerId) {

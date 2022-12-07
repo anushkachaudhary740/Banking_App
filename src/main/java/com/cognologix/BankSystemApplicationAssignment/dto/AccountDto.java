@@ -13,6 +13,7 @@ import lombok.Setter;
 public class AccountDto {
     private Integer accountNumber;
     //private Integer customerId;
+    private String accountStatus;
     private String bankName;
     private String typeOfAccount;
     private Double totalAmount;

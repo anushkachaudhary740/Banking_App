@@ -42,8 +42,8 @@ public class TransactionController {
 
     }
     @PutMapping("/amount/transfer")
-    public ResponseEntity<ApiResponse> moneyTransfer(@Valid @PathParam("senderAccountId") Integer senderAccountId, @PathParam("receiverAccountId") Integer receiverAccountId, @PathParam("amount") Double amount) {
-        transactionServices.amountTransfer(senderAccountId, receiverAccountId, amount);
+    public ResponseEntity<ApiResponse> moneyTransfer(@Valid @PathParam("senderAccountNumber") Integer senderAccountNumber, @PathParam("receiverAccountNumber") Integer receiverAccountNumber, @PathParam("amount") Double amount) {
+        transactionServices.amountTransfer(senderAccountNumber, receiverAccountNumber, amount);
         return new ResponseEntity<>(new ApiResponse("Rs "+amount+" successfully transfer......",true), HttpStatus.OK);
     }
 

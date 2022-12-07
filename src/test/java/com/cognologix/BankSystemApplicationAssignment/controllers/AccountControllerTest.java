@@ -36,23 +36,23 @@ class AccountControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private AccountServices accountServices;
+    private AccountDto accountDto;
     @Test
     void saveAccount() throws Exception {
         // given - precondition or setup
-        Integer accountNumber = 1;
-        AccountDto accountDto= AccountDto.builder()
+         AccountDto accountDto= AccountDto.builder()
                 .bankName("sbi bank")
                 .typeOfAccount("saving")
                 .totalAmount(500.00)
                 .build();
-        given(accountServices.createAccount(any(AccountDto.class)))
-        .willAnswer((e)-> e.getArgument(0));
+        given(accountServices.createAccount(accountDto))
+        .willReturn(accountDto);
         // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(post("/account/create")
         .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)));
         //then - verify
-        response.andDo(print())
+        response.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.bankName", is(accountDto.getBankName())))
                 .andExpect(jsonPath("$.typeOfAccount", is(accountDto.getTypeOfAccount())))
                 .andExpect(jsonPath("$.totalAmount", is(accountDto.getTotalAmount())));
@@ -78,7 +78,7 @@ class AccountControllerTest {
 
     @Test
     void findAccountDetailsById() throws Exception {
-        // given - precondition or setup
+         //given - precondition or setup
         Integer accountNumber = 1;
         AccountDto accountDto= AccountDto.builder()
                 .bankName("sbi bank")
@@ -123,9 +123,6 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.bankName", is(updatedAccountDto.getBankName())))
                 .andExpect(jsonPath("$.typeOfAccount", is(updatedAccountDto.getTypeOfAccount())))
                 .andExpect(jsonPath("$.totalAmount", is(updatedAccountDto.getTotalAmount())));
-
-
-
     }
 
     @Test

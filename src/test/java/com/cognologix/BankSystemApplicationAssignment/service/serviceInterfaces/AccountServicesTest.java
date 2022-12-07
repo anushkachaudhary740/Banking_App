@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,14 +36,14 @@ class AccountServicesTest {
     private AccountDto accountDto;
    @Autowired
    private AccountConverter accountConverter;
-   @Autowired
-    private ModelMapper modelMapper;
+  // @Autowired
+    //private ModelMapper modelMapper;
 
     @BeforeEach
     void setup(){
          accountDto= AccountDto.builder()
                 .accountNumber(12)
-                .bankName("sbi bank")
+                .bankName("SBI Bank")
                 .typeOfAccount("saving")
                 .totalAmount(500.00)
                 .build();
@@ -52,7 +51,7 @@ class AccountServicesTest {
     @Test
     void getAccountDetails() {
         when(accountRepo.findAll()).thenReturn((List<Account>) Stream
-                .of(new Account(376, "sbi ", "saving",700.00)).collect(Collectors.toList()));
+                .of(new Account( 3234,"Active ","SBI Bank", "saving",700.0)).collect(Collectors.toList()));
         assertEquals(1, accountServices.getAccountDetails().size());
     }
 
@@ -62,37 +61,39 @@ class AccountServicesTest {
         given(accountRepo.findById(12)).willReturn(Optional.ofNullable(account));
         AccountDto accountDto1=this.accountConverter.modelToDto(account);
         // when
+
         Optional<AccountDto> savedAccount = accountServices.getAccountDetailsByNumber(accountDto1.getAccountNumber());
         // then
         assertThat(savedAccount).isNotNull();
+
     }
 
 
 
     @Test
     void createAccount() {
-//        Account account=this.accountDtoToModelConverter.dtoToModel(accountDto);
-//        given(accountRepo.findById(account.getAccountNumber()))
-//                .willReturn(Optional.empty());
+//        Account account=this.accountConverter.dtoToModel(accountDto);
+////        given(accountRepo.findById(account.getAccountNumber()))
+////                .willReturn(Optional.empty());
 //        given(accountRepo.save(account)).willReturn(account);
 //        System.out.println("account......"+account);
-//        AccountDto savedAccount = accountServices.createAccount(accountDto);
+//        AccountDto accountDto1=this.accountConverter.modelToDto(account);
+//        AccountDto savedAccount = accountServices.createAccount(accountDto1);
 //        //System.out.println("savedAccount"+savedAccount);
 //        assertThat(savedAccount).isNotNull();
     }
 
     @Test
     void updateAccount() {
-        // given - precondition or setup
+        // given - setup
         Account account = this.accountConverter.dtoToModel(accountDto);
         given(accountRepo.save(account)).willReturn(account);
         accountDto.setBankName("SBI Bank");
         accountDto.setTypeOfAccount("current");
         accountDto.setTotalAmount(700.00);
-// when -  action or the behaviour that we are going test
+        // when -  action or the behaviour that we are going test
         AccountDto updateAccount = accountServices.updateAccount(accountDto);
-
-// then - verify the output
+        // then - verify the output
         Assertions.assertThat(updateAccount.getTypeOfAccount()).isEqualTo("current");
         Assertions.assertThat(updateAccount.getBankName()).isEqualTo("SBI Bank");
     }

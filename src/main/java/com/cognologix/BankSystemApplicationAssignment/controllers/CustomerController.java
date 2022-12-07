@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
@@ -31,13 +33,28 @@ public class CustomerController {
         return  ResponseEntity.ok(this.customerServices.findAllCustomerDetails());
     }
     @GetMapping("/get/{customerId}")
-    public ResponseEntity<CustomerDto> findCustomerDetailsById( @PathVariable("customerId") Integer customerId){
+    public ResponseEntity<Optional<CustomerDto>> findCustomerDetailsById(@PathVariable("customerId") Integer customerId){
         return ResponseEntity.ok(this.customerServices.getCustomerById(customerId));
     }
     @PutMapping("/update/{customerId}")
     public ResponseEntity<CustomerDto> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto, @PathVariable("customerId") Integer customerId){
-        this.customerServices.updateCustomerDetails(customerDto,customerId);
-        return new ResponseEntity<>(customerDto, HttpStatus.OK);
+//        this.customerServices.updateCustomerDetails(customerDto,customerId);
+//        return new ResponseEntity<>(customerDto, HttpStatus.OK);
+        return customerServices.getCustomerById(customerId)
+                .map(e -> {
+
+                    e.setCustomerName(customerDto.getCustomerName());
+                    e.setCustomerEmail(customerDto.getCustomerEmail());
+                    e.setCustomerMobileNumber(customerDto.getCustomerMobileNumber());
+                    e.setCustomerDateOfBirth(customerDto.getCustomerDateOfBirth());
+                    e.setCustomerPanCardNumber(customerDto.getCustomerPanCardNumber());
+                    e.setCustomerAadharCardNumber(customerDto.getCustomerAadharCardNumber());
+                    CustomerDto customerDto1=customerServices.updateCustomerDetails(e);
+                    return new ResponseEntity<>( customerDto1,HttpStatus.OK);
+
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
 
     }
     @DeleteMapping("/delete/{customerId}")

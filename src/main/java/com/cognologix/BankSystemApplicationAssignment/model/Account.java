@@ -25,7 +25,9 @@ public class Account {
     private Integer accountNumber;
     //private String accountHolderName;
     //private Integer customerId;
+    private String accountStatus;
     private String bankName;
     private String typeOfAccount;
     private Double totalAmount;
+    //private Customer customer;
 }
