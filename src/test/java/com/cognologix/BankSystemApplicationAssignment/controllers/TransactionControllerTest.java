@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -74,18 +76,28 @@ void setUp(){
         TransactionDto accMoneyTransferSaveDto = new TransactionDto();
         accMoneyTransferSaveDto.setFromAccountNumber(1);
         accMoneyTransferSaveDto.setToAccountNumber(2);
-        accMoneyTransferSaveDto.setTransferAmount(100.00);
-        accMoneyTransferSaveDto.setStatus("amount transfer testing");
+        //accMoneyTransferSaveDto.setTransferAmount(100.00);
+        //accMoneyTransferSaveDto.setStatus("amount transfer testing");
 
         String content = objectMapper.writeValueAsString(accMoneyTransferSaveDto);
 
-        MvcResult result = mockMvc.perform(
-                put("transaction/amount/transfer",accMoneyTransferSaveDto.getFromAccountNumber(),accMoneyTransferSaveDto.getToAccountNumber(),accMoneyTransferSaveDto.getTransferAmount()).content(content).contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk()).andReturn();
+        ResultActions result = mockMvc.perform(
+                put("/transaction/deposit?accountNumber=2&depositAmount=500",accMoneyTransferSaveDto.getFromAccountNumber(),accMoneyTransferSaveDto.getToAccountNumber(),accMoneyTransferSaveDto.getTransferAmount()).content(content).contentType(MediaType.APPLICATION_JSON)
+        );
+                result.andExpect(status()
+                .isOk()).andExpect(jsonPath("$.message",is("Rs 500.0 Successfully deposit.....")))
+                .andExpect(jsonPath("$.success",is("true")))
+                .andReturn();
+//        mockMvc.perform(MockMvcRequestBuilders.put("/transaction/deposit?accountNumber=2&depositAmount=500"))
+//                .andExpect(status().isOk())
+//                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+//                .andExpect(jsonPath("$.message",is("Rs 500.0 Successfully deposit.....")))
+//                .andExpect(jsonPath("$.success",is(true)))
+//                .andReturn();
 
-        MvcResult isSuccess = result;
-
-        assertTrue((BooleanSupplier) isSuccess);
+//        MvcResult isSuccess = result;
+//
+//        assertE((BooleanSupplier) isSuccess);
 
     }
 
