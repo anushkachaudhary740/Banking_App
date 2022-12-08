@@ -64,11 +64,7 @@ class AccountControllerTest {
         listOfAccount.add(AccountDto.builder().accountNumber(12).bankName("HDFC Bank").typeOfAccount("saving").totalAmount(567.00).build());
         listOfAccount.add(AccountDto.builder().accountNumber(23).bankName("SBI Bank").typeOfAccount("current").totalAmount(600.00).build());
         given(accountServices.getAccountDetails()).willReturn(listOfAccount);
-
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(get("/account/get"));
-
-        // then - verify the output
         response.andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.size()",
@@ -78,7 +74,6 @@ class AccountControllerTest {
 
     @Test
     void findAccountDetailsById() throws Exception {
-         //given - precondition or setup
         Integer accountNumber = 1;
         AccountDto accountDto= AccountDto.builder()
                 .bankName("sbi bank")
@@ -86,9 +81,7 @@ class AccountControllerTest {
                 .totalAmount(500.00)
                 .build();
         given(accountServices.getAccountDetailsByNumber(accountNumber)).willReturn(Optional.ofNullable(accountDto));
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(get("/account/get/{id}", accountNumber));
-        // then - verify the output
         response
                 .andDo(print())
                 .andExpect(jsonPath("$.bankName", is(accountDto.getBankName())))
@@ -114,7 +107,6 @@ class AccountControllerTest {
         given(accountServices.getAccountDetailsByNumber(accountNumber)).willReturn(Optional.of(accountDto));
         given(accountServices.updateAccount(any(AccountDto.class)))
                 .willAnswer((invocation)-> invocation.getArgument(0));
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(put("/account/update/{accountNumber}",accountNumber)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedAccountDto)));
@@ -127,14 +119,9 @@ class AccountControllerTest {
 
     @Test
     void deleteAccountDetailsById() throws Exception {
-        // given - precondition or setup
         Integer accountNumber= 12;
         willDoNothing().given(accountServices).deleteAccount(accountNumber);
-
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(delete("/account/delete/{accountNumber}", accountNumber));
-
-        // then - verify the output
         response.andExpect(status().isOk())
                 .andDo(print());
 

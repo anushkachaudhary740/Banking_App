@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -52,17 +54,28 @@ void setUp(){
             .transactionId(21)
             .toAccountNumber(1)
             .fromAccountNumber(2)
-            .transferAmount(200.00)
+            .transferAmount(0.00)
+            .status("Transaction testing")
             .build();
 }
     @Test
+    void testGetTransactionDetails() throws Exception {
+        List<TransactionDto> listOfAccount = new ArrayList<>();
+        //given - setup
+        given(transactionServices.getTransactionDetails()).willReturn(listOfAccount);
+        // when -  the behaviour that we are going test
+        ResultActions response = mockMvc.perform(get("/transaction/get"));
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.size()",
+                        is(listOfAccount.size())));
+    }
+    @Test
     void findTransactionDetailsById() throws Exception {
-        // given - precondition or setup
         Integer transactionId = 21;
         given(transactionServices.getTransactionDetailsById(transactionId)).willReturn(transactionDto);
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(get("/transaction/get/{transactionId}", transactionId));
-        // then - verify the output
         response
                 .andDo(print())
                 .andExpect(jsonPath("$.transactionId", is(transactionDto.getTransactionId())))
@@ -73,40 +86,42 @@ void setUp(){
 
     @Test
     void depositAmount() throws Exception {
-        TransactionDto accMoneyTransferSaveDto = new TransactionDto();
-        accMoneyTransferSaveDto.setFromAccountNumber(1);
-        accMoneyTransferSaveDto.setToAccountNumber(2);
-        //accMoneyTransferSaveDto.setTransferAmount(100.00);
-        //accMoneyTransferSaveDto.setStatus("amount transfer testing");
-
-        String content = objectMapper.writeValueAsString(accMoneyTransferSaveDto);
-
+        String content = objectMapper.writeValueAsString(transactionDto);
         ResultActions result = mockMvc.perform(
-                put("/transaction/deposit?accountNumber=2&depositAmount=500",accMoneyTransferSaveDto.getFromAccountNumber(),accMoneyTransferSaveDto.getToAccountNumber(),accMoneyTransferSaveDto.getTransferAmount()).content(content).contentType(MediaType.APPLICATION_JSON)
+                put("/transaction/deposit?accountNumber=2&depositAmount=500",transactionDto.getToAccountNumber(),500.00)
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
         );
-                result.andExpect(status()
-                .isOk()).andExpect(jsonPath("$.message",is("Rs 500.0 Successfully deposit.....")))
-                .andExpect(jsonPath("$.success",is("true")))
+        result.andExpect(status()
+                        .isOk()).andExpect(jsonPath("$.message",is("Rs 500.0 Successfully deposit.....")))
+                        .andExpect(jsonPath("$.success",is(true)))
+                        .andReturn();
+    }
+
+    @Test
+    void withdrawAmount() throws Exception {
+        String content = objectMapper.writeValueAsString(transactionDto);
+        ResultActions result = mockMvc.perform(
+                put("/transaction/withdraw?accountNumber=1&withdrawAmount=300",transactionDto.getToAccountNumber(),300.00)
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+        );
+        result.andExpect(status()
+                        .isOk()).andExpect(jsonPath("$.message",is("Rs 300.0 Successfully withdraw......")))
+                .andExpect(jsonPath("$.success",is(true)))
                 .andReturn();
-//        mockMvc.perform(MockMvcRequestBuilders.put("/transaction/deposit?accountNumber=2&depositAmount=500"))
-//                .andExpect(status().isOk())
-//                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-//                .andExpect(jsonPath("$.message",is("Rs 500.0 Successfully deposit.....")))
-//                .andExpect(jsonPath("$.success",is(true)))
-//                .andReturn();
-
-//        MvcResult isSuccess = result;
-//
-//        assertE((BooleanSupplier) isSuccess);
-
     }
 
     @Test
-    void withdrawAmount() {
+    void moneyTransfer() throws Exception {
+        String content = objectMapper.writeValueAsString(transactionDto);
+        ResultActions result = mockMvc.perform(
+                put("/transaction/amount/transfer?senderAccountNumber=2&receiverAccountNumber=1&amount=100",transactionDto.getFromAccountNumber(),transactionDto.getToAccountNumber(),100.00)
+                        .content(content).contentType(MediaType.APPLICATION_JSON)
+        );
+        result.andExpect(status()
+                        .isOk()).andExpect(jsonPath("$.message",is("Rs 100.0 successfully transfer......")))
+                .andExpect(jsonPath("$.success",is(true)))
+                .andReturn();
     }
 
-    @Test
-    void moneyTransfer() {
-    }
 
 }

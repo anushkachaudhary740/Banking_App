@@ -71,12 +71,8 @@ class CustomerControllerTest {
     @Test
     void getCustomerDetails() throws Exception {
         List<CustomerDto> listOfAccount = new ArrayList<>();
-        listOfAccount.add(CustomerDto.builder().customerId(56).customerName("Ram").gender("male").customerEmail("ram@gmail.com").customerMobileNumber("786543890").customerAadharCardNumber("1238 4567 8907").customerPanCardNumber("1C234D56").customerDateOfBirth("00/00/00").build());
-        listOfAccount.add(CustomerDto.builder().customerId(89).customerName("Mohan").gender("male").customerEmail("mohan@gmail.com").customerMobileNumber("7408336672").customerAadharCardNumber("5432 1234 8765").customerPanCardNumber("546C7678D").customerDateOfBirth("00/00/00").build());
         given(customerServices.findAllCustomerDetails()).willReturn(listOfAccount);
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(get("/customer/get"));
-        // then - verify the output
         response.andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.size()",
@@ -84,12 +80,9 @@ class CustomerControllerTest {
     }
     @Test
     void findCustomerDetailsById() throws Exception {
-        // given - precondition or setup
         Integer customerId = 501;
         given(customerServices.getCustomerById(customerId)).willReturn(Optional.ofNullable(customerDto));
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(get("/customer/get/{customerId}", customerId));
-        // then - verify the output
         response
                 .andDo(print())
                 .andExpect(jsonPath("$.customerId", is(customerDto.getCustomerId())))
@@ -124,12 +117,9 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomerDetailsById() throws Exception {
-        // given - precondition or setup
         Integer customerId= 101;
         willDoNothing().given(customerServices).deleteCustomer(customerId);
-        // when -  action or the behaviour that we are going test
         ResultActions response = mockMvc.perform(delete("/customer/delete/{customerId}",customerId));
-        // then - verify the output
         response.andExpect(status().isOk())
                 .andDo(print());
     }
