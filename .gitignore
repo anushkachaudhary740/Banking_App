@@ -1,2 +1,6 @@
 .idea/**
-target/**
+traget
+.mvn/**
+mvnw/**
+mvnw.cmd/**
+HELP.md/**
