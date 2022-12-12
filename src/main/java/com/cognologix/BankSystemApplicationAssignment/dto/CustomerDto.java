@@ -37,15 +37,4 @@ public class CustomerDto {
     private String address;
     private String pinCode;
     private List<AccountDto> accountDetails;
-
-    public CustomerDto(Integer customerId, String customerName, String gender, String customerMobileNumber, String customerEmail, String customerPanCardNumber, String customerAadharCardNumber, String customerDateOfBirth) {
-        this.customerId = customerId;
-        this.customerName = customerName;
-        this.gender = gender;
-        this.customerMobileNumber = customerMobileNumber;
-        this.customerEmail = customerEmail;
-        this.customerPanCardNumber = customerPanCardNumber;
-        this.customerAadharCardNumber = customerAadharCardNumber;
-        this.customerDateOfBirth = customerDateOfBirth;
-    }
 }

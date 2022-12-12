@@ -1,5 +1,5 @@
 package com.cognologix.BankSystemApplicationAssignment.service.servicesimplementation;
-import com.cognologix.BankSystemApplicationAssignment.converter.AccountConverter;
+import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
@@ -18,37 +18,37 @@ public class AccountServicesImplementation implements AccountServices {
     private AccountRepo accountRepo;
     @Autowired
     //private AccountDtoToModelConverter accountDtoToModelConverter;
-    private AccountConverter accountConverter;
+    private Converter converter;
     
     @Override
     public List<AccountDto> getAccountDetails() {
 
         List<Account> list=this.accountRepo.findAll();
-        List<AccountDto> accDtos =list.stream().map(e-> this.accountConverter.modelToDto(e))
+        List<AccountDto> accDtos =list.stream().map(e-> this.converter.accountModelToDto(e))
                 .collect(Collectors.toList());
         return accDtos;
     }
     @Override
     public Optional<AccountDto> getAccountDetailsByNumber(Integer accountNumber) {
         Account account=this.accountRepo.findById(accountNumber).orElseThrow(()->new ResourceNotFoundException("Account","Number",accountNumber));
-        return Optional.ofNullable(this.accountConverter.modelToDto(account));
+        return Optional.ofNullable(this.converter.accountModelToDto(account));
     }
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
         Integer accNum=1000000000;
         accountDto.setAccountNumber(accountDto.getAccountNumber()+accNum);
-        Account accountDetails = this.accountConverter.dtoToModel(accountDto);
+        Account accountDetails = this.converter.accountDtoToModel(accountDto);
 
         Account acc = this.accountRepo.save(accountDetails);
-        return this.accountConverter.modelToDto(acc);
+        return this.converter.accountModelToDto(acc);
     }
 
     @Override
     public AccountDto updateAccount(AccountDto accountDto) {
-        Account accountDetails = this.accountConverter.dtoToModel(accountDto);
+        Account accountDetails = this.converter.accountDtoToModel(accountDto);
         //accountDetails.setAccountNumber(accountNumber);
         this.accountRepo.save(accountDetails);
-        return this.accountConverter.modelToDto(accountDetails);
+        return this.converter.accountModelToDto(accountDetails);
 
     }
 
@@ -57,7 +57,7 @@ public class AccountServicesImplementation implements AccountServices {
         Optional<Account> list1 = accountRepo.findById(accountNumber);
         Account Balance1 = list1.get();
         Double totalBalance = Balance1.getTotalAmount();
-        this.accountConverter.modelToDto(Balance1);
+        this.converter.accountModelToDto(Balance1);
         return totalBalance;
     }
 

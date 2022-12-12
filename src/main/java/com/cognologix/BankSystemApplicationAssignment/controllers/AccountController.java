@@ -39,11 +39,8 @@ public class AccountController {
     }
     @PutMapping("/update/{accountNumber}")
     public ResponseEntity<?> updateAccountDetails(@Valid @RequestBody AccountDto accountDto,@PathVariable("accountNumber") Integer accountNumber){
-//        this.accountServices.updateAccount(accountDto,accountNumber);
-//        return new ResponseEntity<>("Account updated successfully..", HttpStatus.OK);
-        return accountServices.getAccountDetailsByNumber(accountNumber)
+return accountServices.getAccountDetailsByNumber(accountNumber)
                 .map(savedAccount -> {
-
                     savedAccount.setBankName(accountDto.getBankName());
                     savedAccount.setTypeOfAccount(accountDto.getTypeOfAccount());
                     savedAccount.setTotalAmount(accountDto.getTotalAmount());

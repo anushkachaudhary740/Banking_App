@@ -2,21 +2,23 @@ package com.cognologix.BankSystemApplicationAssignment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-
-@Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Component
-public class TransactionDto {
+@ToString
+@Builder
+public class AmountTransferDto {
     private Integer toAccountNumber;
+    private Integer fromAccountNumber;
     private Double transferAmount;
     private String status;
     private LocalDate date;

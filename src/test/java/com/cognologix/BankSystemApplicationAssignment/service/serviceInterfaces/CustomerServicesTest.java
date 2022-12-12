@@ -1,11 +1,7 @@
 package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces;
-import com.cognologix.BankSystemApplicationAssignment.converter.AccountConverter;
-import com.cognologix.BankSystemApplicationAssignment.converter.CustomerConverter;
-import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
+import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
-import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
-import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +19,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +29,7 @@ class CustomerServicesTest {
     @MockBean
     private CustomerRepo customerRepo;
     @Autowired
-    private CustomerConverter customerConverter;
+    private Converter customerConverter;
 
     @BeforeEach
     void setUp(){
@@ -55,7 +47,7 @@ class CustomerServicesTest {
 
     @Test
     void createNewCustomer() {
-        Customer customer = this.customerConverter.dtoToModel(customerDto);
+        Customer customer = this.customerConverter.customerDtoToModel(customerDto);
         given(customerRepo.findById(customer.getCustomerId()))
                 .willReturn(Optional.of(customer));
         given(customerRepo.save(customer)).willReturn(customer);
@@ -67,7 +59,7 @@ class CustomerServicesTest {
 
     @Test
     void getCustomerById() {
-        Customer customer = this.customerConverter.dtoToModel(customerDto);
+        Customer customer = this.customerConverter.customerDtoToModel(customerDto);
 
         //given
         given(customerRepo.findById(199)).willReturn(Optional.of(customer));
@@ -85,7 +77,7 @@ class CustomerServicesTest {
     @Test
     void updateCustomerDetails() {
         // given -setup
-        Customer customer = this.customerConverter.dtoToModel(customerDto);
+        Customer customer = this.customerConverter.customerDtoToModel(customerDto);
         given(customerRepo.save(customer)).willReturn(customer);
         customerDto.setCustomerName("Anu");
         customerDto.setCustomerEmail("anu@gmail.com");

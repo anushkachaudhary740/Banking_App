@@ -1,6 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces;
 
-import com.cognologix.BankSystemApplicationAssignment.converter.AccountConverter;
+import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
@@ -35,7 +35,7 @@ class AccountServicesTest {
     private AccountRepo accountRepo;
     private AccountDto accountDto;
    @Autowired
-   private AccountConverter accountConverter;
+   private Converter converter;
   // @Autowired
     //private ModelMapper modelMapper;
 
@@ -57,11 +57,10 @@ class AccountServicesTest {
 
     @Test
     void getAccountByNumber() {
-        Account account=this.accountConverter.dtoToModel(accountDto);
+        Account account=this.converter.accountDtoToModel(accountDto);
         given(accountRepo.findById(12)).willReturn(Optional.ofNullable(account));
-        AccountDto accountDto1=this.accountConverter.modelToDto(account);
+        AccountDto accountDto1=this.converter.accountModelToDto(account);
         // when
-
         Optional<AccountDto> savedAccount = accountServices.getAccountDetailsByNumber(accountDto1.getAccountNumber());
         // then
         assertThat(savedAccount).isNotNull();
@@ -86,7 +85,7 @@ class AccountServicesTest {
     @Test
     void updateAccount() {
         // given - setup
-        Account account = this.accountConverter.dtoToModel(accountDto);
+        Account account = this.converter.accountDtoToModel(accountDto);
         given(accountRepo.save(account)).willReturn(account);
         accountDto.setBankName("SBI Bank");
         accountDto.setTypeOfAccount("current");

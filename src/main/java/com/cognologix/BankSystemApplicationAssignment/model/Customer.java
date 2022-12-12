@@ -42,19 +42,19 @@ import java.util.List;
 
         @Column(name="mobile_number")
         @NotBlank(message = "Provide Valid Mobile Number")
-        @Size(min = 10,max = 10)
+        //@Size(min = 10,max = 10)
         private String customerMobileNumber;
 
         @Column(name="email")
         private String customerEmail;
 
         @NotBlank(message = "Provide valid PanCard number")
-        @Size(min = 10,max = 10)
+        //@Size(min = 10,max = 10)
         @Column(name="panCard_number")
         private String customerPanCardNumber;
 
         @NotBlank(message = "Provide valid Aadhar number")
-        @Size(min = 12,max = 12)
+        //@Size(min = 12,max = 12)
         @Column(name="aadhar_card_number")
         private String customerAadharCardNumber;
 
