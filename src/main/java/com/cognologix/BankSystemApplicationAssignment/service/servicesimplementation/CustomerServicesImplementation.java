@@ -3,6 +3,7 @@ import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
+import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,10 @@ public class CustomerServicesImplementation implements CustomerServices {
 
     }
     @Override
-    public void deleteCustomer(Integer customerId) {
+    public CustomerResponse deleteCustomer(Integer customerId) {
         this.customerRepo.deleteById(customerId);
+        CustomerResponse customerResponse=new CustomerResponse("Account deleted successfully..",true);
+        return customerResponse;
     }
 
 }

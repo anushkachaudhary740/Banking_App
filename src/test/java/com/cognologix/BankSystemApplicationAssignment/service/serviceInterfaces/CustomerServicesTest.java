@@ -3,6 +3,7 @@ import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,9 +89,9 @@ class CustomerServicesTest {
         // when -  action or the behaviour that we are going test
         CustomerDto updatedCustomer = customerServices.updateCustomerDetails(customerDto);
         // then - verify the output
-        org.assertj.core.api.Assertions.assertThat(updatedCustomer.getCustomerName()).isEqualTo("Anu");
-        org.assertj.core.api.Assertions.assertThat(updatedCustomer.getCustomerPanCardNumber()).isEqualTo("12C3456D789");
-        org.assertj.core.api.Assertions.assertThat(updatedCustomer.getCustomerMobileNumber()).isEqualTo("8765986545");
+        Assertions.assertThat(updatedCustomer.getCustomerName()).isEqualTo("Anu");
+        Assertions.assertThat(updatedCustomer.getCustomerPanCardNumber()).isEqualTo("12C3456D789");
+        Assertions.assertThat(updatedCustomer.getCustomerMobileNumber()).isEqualTo("8765986545");
     }
 
     @Test

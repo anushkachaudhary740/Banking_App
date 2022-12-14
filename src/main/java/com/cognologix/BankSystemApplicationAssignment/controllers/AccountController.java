@@ -1,5 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.ApiResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.BaseResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class AccountController {
     private AccountServices accountServices;
     @PostMapping("/create")
     public ResponseEntity<AccountDto> saveAccount(@Valid @RequestBody AccountDto account){
-        accountServices.createAccount(account);
-        return new ResponseEntity<>(account,HttpStatus.CREATED);
+        AccountDto accountDto=accountServices.createAccount(account);
+        return new ResponseEntity<>(accountDto,HttpStatus.CREATED);
     }
     @GetMapping("/get")
     public ResponseEntity<List<AccountDto>> getAccountDetails() {
@@ -53,14 +54,14 @@ return accountServices.getAccountDetailsByNumber(accountNumber)
 
     }
     @GetMapping("/amount/{accountNumber}")
-    public ResponseEntity<ApiResponse> findTotalBalance( @PathVariable("accountNumber") Integer accountNumber){
-        Double currentBalance=accountServices.getTotalBalance(accountNumber);
-        return new ResponseEntity<>(new ApiResponse("Total balance : "+currentBalance,true), HttpStatus.OK);
+    public ResponseEntity<AccountResponse> findTotalBalance(@PathVariable("accountNumber") Integer accountNumber){
+        AccountResponse accountResponse=accountServices.getTotalBalance(accountNumber);
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{accountNumber}")
-    public ResponseEntity<ApiResponse> deleteAccountDetailsById(@PathVariable("accountNumber") Integer accountNumber){
-        this.accountServices.deleteAccount(accountNumber);
-        return new ResponseEntity<ApiResponse>(new ApiResponse("Account deleted successfully..",true), HttpStatus.OK);
+    public ResponseEntity<AccountResponse> deleteAccountDetailsById(@PathVariable("accountNumber") Integer accountNumber){
+        AccountResponse accountResponse=this.accountServices.deleteAccount(accountNumber);
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
 }

@@ -1,9 +1,8 @@
 package com.cognologix.BankSystemApplicationAssignment.converter;
 
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
-import com.cognologix.BankSystemApplicationAssignment.dto.AmountTransferDto;
-import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
+import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
 import com.cognologix.BankSystemApplicationAssignment.model.Transaction;
@@ -36,13 +35,13 @@ public class Converter {
         return cdto;
     }
     //Transaction dto to model converter
-    public Transaction transferDtoToModel(AmountTransferDto amountTransferDto){
-        Transaction transModel=this.modelMapper.map(amountTransferDto,Transaction.class);
+    public Transaction transferDtoToModel(TransactionDto TransactionDto){
+        Transaction transModel=this.modelMapper.map(TransactionDto,Transaction.class);
         return transModel;
     }
     //model to dto converter
-    public AmountTransferDto transferModelToDto(Transaction transaction){
-        AmountTransferDto transDto=this.modelMapper.map(transaction, AmountTransferDto.class);
+    public TransactionDto transferModelToDto(Transaction transaction){
+        TransactionDto transDto=this.modelMapper.map(transaction, TransactionDto.class);
         return transDto;
     }
     //for deposit and withdraw converter

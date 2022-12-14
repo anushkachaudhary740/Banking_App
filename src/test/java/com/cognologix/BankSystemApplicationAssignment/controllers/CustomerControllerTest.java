@@ -1,6 +1,7 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
+import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -117,10 +119,14 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomerDetailsById() throws Exception {
+        CustomerResponse customerResponse=new CustomerResponse();
+        customerResponse.setMessage("Account deleted successfully..");
+        customerResponse.setSuccess(true);
         Integer customerId= 101;
-        willDoNothing().given(customerServices).deleteCustomer(customerId);
+        when(customerServices.deleteCustomer(customerId)).thenReturn(customerResponse);
         ResultActions response = mockMvc.perform(delete("/customer/delete/{customerId}",customerId));
         response.andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(jsonPath("$.message",is(customerResponse.getMessage())));
     }
 }

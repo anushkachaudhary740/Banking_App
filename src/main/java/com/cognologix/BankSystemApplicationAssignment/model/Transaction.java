@@ -33,11 +33,4 @@ public class Transaction {
     @Temporal(TemporalType.TIMESTAMP)
     private Date DateAndTime = new Date();
 
-//    public Transaction(Integer transactionId, Integer toAccountNumber,Integer fromAccountNumber,Double transferAmount,String status) {
-//        this.transactionId=transactionId;
-//        this.toAccountNumber=toAccountNumber;
-//        this.fromAccountNumber=fromAccountNumber;
-//        this.transferAmount=transferAmount;
-//        this.status=status;
-   // }
 }

@@ -1,5 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
+import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,6 @@ public interface CustomerServices {
     Optional<CustomerDto> getCustomerById(Integer customerId);
     List<CustomerDto> findAllCustomerDetails();
     CustomerDto updateCustomerDetails(CustomerDto customerDto);
-    void deleteCustomer(Integer customerId);
+    CustomerResponse deleteCustomer(Integer customerId);
 
 }

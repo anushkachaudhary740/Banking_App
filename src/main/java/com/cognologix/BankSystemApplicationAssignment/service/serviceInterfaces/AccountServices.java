@@ -1,5 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface AccountServices {
     Optional<AccountDto> getAccountDetailsByNumber(Integer accountNumber);
     AccountDto createAccount(AccountDto account);
     AccountDto updateAccount(AccountDto accountDto);
-    Double getTotalBalance(Integer accountNumber);
-    void deleteAccount(Integer accountNumber);
+    AccountResponse getTotalBalance(Integer accountNumber);
+    AccountResponse deleteAccount(Integer accountNumber);
 
 }

@@ -1,6 +1,7 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -119,11 +121,30 @@ class AccountControllerTest {
 
     @Test
     void deleteAccountDetailsById() throws Exception {
+        AccountResponse accountResponse=new AccountResponse();
+        accountResponse.setMessage("Account deleted successfully..");
+        accountResponse.setSuccess(true);
         Integer accountNumber= 12;
-        willDoNothing().given(accountServices).deleteAccount(accountNumber);
+        when(accountServices.deleteAccount(12)).thenReturn(accountResponse);
         ResultActions response = mockMvc.perform(delete("/account/delete/{accountNumber}", accountNumber));
         response.andExpect(status().isOk())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(jsonPath("$.message",is(accountResponse.getMessage())))
+                .andReturn();
 
+    }
+
+    @Test
+    void findTotalBalance() throws Exception {
+        AccountResponse accountResponse=new AccountResponse();
+        accountResponse.setMessage("Total balance : 6786.0");
+        accountResponse.setSuccess(true);
+        Integer accountNumber=1;
+        when(accountServices.getTotalBalance(1)).thenReturn(accountResponse);
+        ResultActions response = mockMvc.perform(get("/account/amount/{accountNumber}", accountNumber));
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.message",is(accountResponse.getMessage())))
+                .andReturn();
     }
 }

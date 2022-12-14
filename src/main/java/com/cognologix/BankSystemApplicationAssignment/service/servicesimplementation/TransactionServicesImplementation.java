@@ -5,8 +5,8 @@ import com.cognologix.BankSystemApplicationAssignment.dao.TransactionsRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.InSufficientBalanceException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
+import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.TransactionServices;
-import com.cognologix.BankSystemApplicationAssignment.dto.AmountTransferDto;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,39 +28,44 @@ public class TransactionServicesImplementation implements TransactionServices {
     private AccountRepo accountRepo;
     Random random=new Random();
     @Override
-    public List<AmountTransferDto> getTransactionDetails() {
+    public List<TransactionDto> getTransactionDetails() {
         List<Transaction> list = this.transactionsRepo.findAll();
-        List<AmountTransferDto> transDtos = list.stream().map(e -> this.transactionConverter.transferModelToDto(e))
+        List<TransactionDto> transDtos = list.stream().map(e -> this.transactionConverter.transferModelToDto(e))
                 .collect(Collectors.toList());
         return transDtos;
     }
 
     @Override
-    public AmountTransferDto getTransactionDetailsById(Integer transactionId) {
+    public TransactionDto getTransactionDetailsById(Integer transactionId) {
         Transaction transaction=this.transactionsRepo.findById(transactionId).orElseThrow(()->new ResourceNotFoundException("transaction","Id",transactionId));
         return this.transactionConverter.transferModelToDto(transaction);
     }
 
     @Override
-    public TransactionDto deposit(Integer accountNumber, Double depositAmount) {
+    public TransactionsResponse depositAmount(Integer accountNumber, Double depositAmount) {
          TransactionDto trans=new TransactionDto();
-        Account account=accountRepo.findById(accountNumber)
-                .orElseThrow(()->new ResourceNotFoundException("account","number",accountNumber));
-            trans.setToAccountNumber(accountNumber);
-            trans.setTransferAmount(depositAmount);
-            trans.setStatus("amount deposited");
-            trans.setDate(LocalDate.now());
-            trans.setTime(LocalTime.now());
-            Transaction trans1=this.transactionConverter.transactionDtoToModel(trans);
-            trans1.setFromAccountNumber(0);
-            this.transactionsRepo.save(trans1);
-            account.setTotalAmount(account.getTotalAmount() + depositAmount);
-            this.accountRepo.save(account);
-            return trans;
+         if(accountRepo.existsById(accountNumber)) {
+             Account account=accountRepo.findById(accountNumber).get();
+             trans.setToAccountNumber(accountNumber);
+             trans.setTransferAmount(depositAmount);
+             trans.setStatus("amount deposited");
+             trans.setDate(LocalDate.now());
+             trans.setTime(LocalTime.now());
+             Transaction trans1 = this.transactionConverter.transactionDtoToModel(trans);
+             trans1.setFromAccountNumber(0);
+             this.transactionsRepo.save(trans1);
+             account.setTotalAmount(account.getTotalAmount() + depositAmount);
+             this.accountRepo.save(account);
+             TransactionsResponse transactionsResponse =new TransactionsResponse("Rs "+depositAmount+" successfully deposit.....",true);
+             return transactionsResponse;
+         }
+         else {
+             throw  new ResourceNotFoundException("account", "number", accountNumber);
+         }
     }
 
     @Override
-    public TransactionDto withDraw(Integer accountNumber, Double withdrawAmount) {
+    public TransactionsResponse withdrawAmount(Integer accountNumber, Double withdrawAmount) {
         Account account=accountRepo.findById(accountNumber)
                 .orElseThrow(()->new ResourceNotFoundException("account","number",accountNumber));
         TransactionDto trans= new TransactionDto();
@@ -75,19 +80,20 @@ public class TransactionServicesImplementation implements TransactionServices {
             this.transactionsRepo.save(trans1);
             account.setTotalAmount(account.getTotalAmount() - withdrawAmount);
             this.accountRepo.save(account);
+            TransactionsResponse transactionsResponse =new TransactionsResponse("Rs "+withdrawAmount+" successfully withdraw.....",true);
+            return transactionsResponse;
         }
         else {
             throw new InSufficientBalanceException(" Insufficient Amount.....");
         }
-        return trans;
     }
     @Override
-    public AmountTransferDto amountTransfer(Integer senderAccountNumber, Integer receiverAccountNumber, Double amount) {
+    public TransactionsResponse transferAmount(Integer senderAccountNumber, Integer receiverAccountNumber, Double amount) {
         Account account=accountRepo.findById(senderAccountNumber)
                 .orElseThrow(()->new ResourceNotFoundException("account","number",senderAccountNumber));
         Account account1=accountRepo.findById(receiverAccountNumber)
                 .orElseThrow(()->new ResourceNotFoundException("account","number",receiverAccountNumber));
-        AmountTransferDto trans=new AmountTransferDto();
+        TransactionDto trans=new TransactionDto();
         if(account.getTotalAmount()>=amount) {
             trans.setFromAccountNumber(senderAccountNumber);
             trans.setTransferAmount(amount);
@@ -106,7 +112,8 @@ public class TransactionServicesImplementation implements TransactionServices {
         this.transactionsRepo.save(trans1);
         account1.setTotalAmount(account1.getTotalAmount() + amount);
         this.accountRepo.save(account1);
-        return trans;
+        TransactionsResponse transactionsResponse =new TransactionsResponse("Rs "+amount+" successfully transfer.....",true);
+        return transactionsResponse;
 
     }
 }

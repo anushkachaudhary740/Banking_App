@@ -1,6 +1,7 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.ApiResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.BaseResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,9 +39,7 @@ public class CustomerController {
     }
     @PutMapping("/update/{customerId}")
     public ResponseEntity<CustomerDto> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto, @PathVariable("customerId") Integer customerId){
-//        this.customerServices.updateCustomerDetails(customerDto,customerId);
-//        return new ResponseEntity<>(customerDto, HttpStatus.OK);
-        return customerServices.getCustomerById(customerId)
+                 return customerServices.getCustomerById(customerId)
                 .map(e -> {
 
                     e.setCustomerName(customerDto.getCustomerName());
@@ -54,13 +53,11 @@ public class CustomerController {
 
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
-
     }
     @DeleteMapping("/delete/{customerId}")
-    public ResponseEntity<ApiResponse> deleteCustomerDetailsById(@PathVariable("customerId") Integer customerId){
-        this.customerServices.deleteCustomer(customerId);
-        return new ResponseEntity<>(new ApiResponse("Account deleted successfully..",true) ,HttpStatus.OK);
+    public ResponseEntity<CustomerResponse> deleteCustomerDetailsById(@PathVariable("customerId") Integer customerId){
+        CustomerResponse customerResponse=this.customerServices.deleteCustomer(customerId);
+        return new ResponseEntity<>(customerResponse ,HttpStatus.OK);
     }
 
 }

@@ -1,9 +1,12 @@
 package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces;
 
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
+import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dao.TransactionsRepo;
-import com.cognologix.BankSystemApplicationAssignment.dto.AmountTransferDto;
+import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
+import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.model.Transaction;
+import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,74 +15,111 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class TransactionServicesTest {
-    @MockBean
+    @Autowired
     private TransactionServices transactionServices;
 
-    private AmountTransferDto amountTransferDto;
+    private TransactionDto transactionDto;
     @MockBean
     private TransactionsRepo transactionsRepo;
     @Autowired
-    private Converter transactionConverter;
+    private Converter converter;
+    @MockBean
+    private AccountRepo accountRepo;
+    @Autowired
+    private Account account;
+    @Autowired
+    private Account account1;
+    private TransactionsResponse transactionsResponse;
     @BeforeEach
-    void setUp(){
-        amountTransferDto = AmountTransferDto.builder()
+    void setUp() {
+        transactionDto = TransactionDto.builder()
+               .transactionId(21)
                 .toAccountNumber(1)
                 .fromAccountNumber(2)
                 .transferAmount(0.00)
                 .status("testing")
                 .build();
     }
+
     @Test
     void getTransactionDetails() {
-       Transaction transaction=this.transactionConverter.transferDtoToModel(amountTransferDto);
-//        transactionsRepo.save(transaction);
-//        transactionServices.getTransactionDetails();
-//        verify(transactionsRepo).findAll();
-//        when(transactionsRepo.findAll()).thenReturn((List<Transaction>) Stream
-//                .of(new Transaction( 3234,1,2,700.0,"Testing")).collect(Collectors.toList()));
-//        assertEquals(1, transactionServices.getTransactionDetails().size());
-
-        transactionsRepo.save(transaction);
-        System.out.println(transactionsRepo);
-//            when(transactionsRepo.findAll()).thenReturn((List<Transaction>) Stream
-//                    .of(new Transaction( 3234,1,2, 0.00,"Testing")).collect(Collectors.toList()));
-//            assertEquals(1, transactionServices.getTransactionDetails().size());
-//        System.out.println("size......"+transactionServices.getTransactionDetails().size());
-
-
+        Transaction transaction=this.converter.transactionDtoToModel(transactionDto);
+        when(transactionsRepo.findAll()).thenReturn(List.of(transaction) );
+       List<TransactionDto> transactionList = transactionServices.getTransactionDetails();
+       assertEquals(1,transactionList.size());
     }
 
     @Test
     void getTransactionDetailsById() {
+        Transaction transaction=this.converter.transactionDtoToModel(transactionDto);
+        when(transactionsRepo.findById(transaction.getTransactionId())).thenReturn(Optional.of(transaction));
+        TransactionDto transactionDto1=transactionServices.getTransactionDetailsById(21);
+        assertEquals(21,transactionDto1.getTransactionId());
     }
 
     @Test
-    void getDeposit() {
+    void depositAmount() {
+        account.setAccountNumber(1);
+        account.setTotalAmount(0.0);
+        Optional<Account> prevAccount = Optional.of(account);
+
+        when(accountRepo.existsById(account.getAccountNumber())).thenReturn(true);
+        when(accountRepo.findById(account.getAccountNumber())).thenReturn(prevAccount);
+        when(accountRepo.save(prevAccount.get())).thenReturn(prevAccount.get());
+         //transactionsResponse.setMessage("Rs 500.0 Successfully deposit.....");
+         Transaction transaction=this.converter.transactionDtoToModel(transactionDto);
+         when(transactionsRepo.save(transaction)).thenReturn(transaction);
+         TransactionsResponse transactionsResponse1=transactionServices.depositAmount(1,500.0);
+         assertEquals("Rs 500.0 successfully deposit.....",transactionsResponse1.getMessage());
     }
 
     @Test
-    void getWithDraw() {
+    void withDrawAmount() {
+        account.setAccountNumber(1);
+        account.setTotalAmount(100.0);
+        Optional<Account> prevAccount = Optional.of(account);
+        //when(accountRepo.existsById(account.getAccountNumber())).thenReturn(true);
+        when(accountRepo.findById(account.getAccountNumber())).thenReturn(prevAccount);
+        when(accountRepo.save(prevAccount.get())).thenReturn(prevAccount.get());
+        Transaction transaction=this.converter.transactionDtoToModel(transactionDto);
+        when(transactionsRepo.save(transaction)).thenReturn(transaction);
+        TransactionsResponse transactionsResponse1=transactionServices.withdrawAmount(1,20.0);
+        assertEquals("Rs 20.0 successfully withdraw.....",transactionsResponse1.getMessage());
 
     }
 
     @Test
-    void amountTransfer() {
-        Double amount =100.00;
-        //Transaction accMoneyTransfer = mock(Transaction.class);
-        AmountTransferDto accMoneyTransferSaveDto = mock(AmountTransferDto.class);
+    void transferAmount() {
+        account=Account.builder()
+                .accountNumber(1)
+                .totalAmount(100.0)
+                .build();
+        account1=Account.builder()
+                .accountNumber(2)
+                .totalAmount(500.0)
+                .build();
+        Optional<Account> prevAccount = Optional.of(account);
+        Optional<Account> prevAccount1 = Optional.of(account1);
+        when(accountRepo.findById(account.getAccountNumber())).thenReturn(prevAccount);
+        when(accountRepo.save(prevAccount.get())).thenReturn(prevAccount.get());
+        when(accountRepo.findById(account1.getAccountNumber())).thenReturn(prevAccount1);
+        when(accountRepo.save(prevAccount1.get())).thenReturn(prevAccount1.get());
 
-        //TransactionDto trans=transactionServices.amountTransfer(transactionDto.getFromAccountNumber(), transactionDto.getToAccountNumber(),amount);
+        Transaction transaction=this.converter.transactionDtoToModel(transactionDto);
+        when(transactionsRepo.save(transaction)).thenReturn(transaction);
+        TransactionsResponse transactionsResponse1=transactionServices.transferAmount(1,2,40.0);
+        assertEquals("Rs 40.0 successfully transfer.....",transactionsResponse1.getMessage());
 
-        AmountTransferDto trans=transactionServices.amountTransfer(accMoneyTransferSaveDto.getToAccountNumber(),accMoneyTransferSaveDto.getFromAccountNumber(),amount);
-        System.out.println(trans);
-        Transaction transaction=this.transactionConverter.transferDtoToModel(trans);
-        verify(transactionsRepo.save(transaction));
 
     }
 }

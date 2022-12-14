@@ -2,6 +2,7 @@ package com.cognologix.BankSystemApplicationAssignment.service.servicesimplement
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
@@ -19,7 +20,6 @@ public class AccountServicesImplementation implements AccountServices {
     @Autowired
     //private AccountDtoToModelConverter accountDtoToModelConverter;
     private Converter converter;
-    
     @Override
     public List<AccountDto> getAccountDetails() {
 
@@ -35,10 +35,11 @@ public class AccountServicesImplementation implements AccountServices {
     }
     @Override
     public AccountDto createAccount(AccountDto accountDto) {
-        Integer accNum=1000000000;
-        accountDto.setAccountNumber(accountDto.getAccountNumber()+accNum);
         Account accountDetails = this.converter.accountDtoToModel(accountDto);
-
+        Optional<Account> savedAccount = accountRepo.findById(accountDetails.getAccountNumber());
+        if(savedAccount.isPresent()){
+            throw new ResourceNotFoundException("Account","AccountNumber",accountDetails.getAccountNumber());
+        }
         Account acc = this.accountRepo.save(accountDetails);
         return this.converter.accountModelToDto(acc);
     }
@@ -53,16 +54,20 @@ public class AccountServicesImplementation implements AccountServices {
     }
 
     @Override
-    public Double getTotalBalance(Integer accountNumber) {
+    public AccountResponse getTotalBalance(Integer accountNumber) {
         Optional<Account> list1 = accountRepo.findById(accountNumber);
         Account Balance1 = list1.get();
         Double totalBalance = Balance1.getTotalAmount();
         this.converter.accountModelToDto(Balance1);
-        return totalBalance;
+        AccountResponse accountResponse=new AccountResponse("Total balance : "+totalBalance,true);
+        return accountResponse;
+
     }
 
     @Override
-    public void deleteAccount(Integer accountNumber) {
+    public AccountResponse deleteAccount(Integer accountNumber) {
         this.accountRepo.deleteById(accountNumber);
+        AccountResponse accountResponse=new AccountResponse("Account deleted successfully..",true);
+        return accountResponse;
     }
 }
