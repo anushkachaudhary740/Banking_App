@@ -10,7 +10,6 @@ public interface CustomerServices {
     CustomerDto createNewCustomer(CustomerDto customerDto);
     Optional<CustomerDto> getCustomerById(Integer customerId);
     List<CustomerDto> findAllCustomerDetails();
-    CustomerDto updateCustomerDetails(CustomerDto customerDto);
+    CustomerResponse updateCustomerDetails(CustomerDto customerDto,Integer customerId);
     CustomerResponse deleteCustomer(Integer customerId);
-
 }

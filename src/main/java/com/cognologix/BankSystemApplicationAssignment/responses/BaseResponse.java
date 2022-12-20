@@ -11,5 +11,5 @@ import lombok.Setter;
 @Setter
 public class BaseResponse {
     private String message;
-    private boolean success;
+    private Boolean success;
 }

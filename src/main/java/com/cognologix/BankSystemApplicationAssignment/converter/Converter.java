@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class Converter {
     @Autowired
@@ -20,7 +22,7 @@ public class Converter {
         return dtoAccount;
     }
     //Account model to dto converter
-    public AccountDto accountModelToDto(Account account){
+    public AccountDto accountModelToDto(Optional<Account> account){
         AccountDto adto = this.modelMapper.map(account,AccountDto.class);
         return adto;
     }

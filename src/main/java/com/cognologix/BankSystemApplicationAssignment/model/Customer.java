@@ -38,24 +38,21 @@ import java.util.List;
         private String customerName;
 
         private String customerGender;
-        //private String bankName;
 
-        @Column(name="mobile_number")
+        @Column(name="mobile_number",length = 10)
         @NotBlank(message = "Provide Valid Mobile Number")
-        //@Size(min = 10,max = 10)
         private String customerMobileNumber;
 
         @Column(name="email")
+        @NotBlank(message = "Provide Valid Email Id")
         private String customerEmail;
 
         @NotBlank(message = "Provide valid PanCard number")
-        //@Size(min = 10,max = 10)
-        @Column(name="panCard_number")
+        @Column(name="panCard_number",length = 10)
         private String customerPanCardNumber;
 
         @NotBlank(message = "Provide valid Aadhar number")
-        //@Size(min = 12,max = 12)
-        @Column(name="aadhar_card_number")
+        @Column(name="aadhar_card_number",length = 12)
         private String customerAadharCardNumber;
 
         @Column(name="date_of_birth")

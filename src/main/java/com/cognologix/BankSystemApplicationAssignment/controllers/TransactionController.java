@@ -2,6 +2,7 @@ package com.cognologix.BankSystemApplicationAssignment.controllers;
 import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.TransactionServices;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/transaction")
@@ -24,26 +26,33 @@ public class TransactionController {
     @GetMapping("/get")
     public ResponseEntity<List<TransactionDto>> getTransactionDetails() {
         List<TransactionDto> list=this.transactionServices.getTransactionDetails();
-        return new ResponseEntity<>(list,HttpStatus.OK);
+        HttpStatus httpStatus=list.size()>0?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(list,httpStatus);
     }
     @GetMapping("/get/{transactionId}")
-    public ResponseEntity<TransactionDto> findTransactionDetailsById(@PathVariable("transactionId") Integer transactionId){
-        return ResponseEntity.ok(this.transactionServices.getTransactionDetailsById(transactionId));
+    public ResponseEntity<Optional<TransactionDto>> findTransactionDetailsById(@PathVariable("transactionId") Integer transactionId){
+        Optional<TransactionDto> transactionDto = (this.transactionServices.getTransactionDetailsById(transactionId));
+        HttpStatus httpStatus=transactionDto.isPresent()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(transactionDto,httpStatus);
+
     }
     @PutMapping("/deposit")
     public ResponseEntity<TransactionsResponse> depositAmount(@Valid @PathParam("accountNumber") Integer accountNumber, @PathParam("depositAmount") Double depositAmount) {
         TransactionsResponse transactionsResponse =transactionServices.depositAmount(accountNumber, depositAmount);
-        return new ResponseEntity<>(transactionsResponse,HttpStatus.OK);
+        HttpStatus httpStatus=transactionsResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(transactionsResponse,httpStatus);
     }
     @PutMapping(value = "/withdraw")
     public ResponseEntity<TransactionsResponse> withdrawAmount(@Valid @PathParam("accountNumber") Integer accountNumber, @PathParam("withdrawAmount") Double withdrawAmount) {
         TransactionsResponse transactionsResponse =this.transactionServices.withdrawAmount(accountNumber,withdrawAmount);
-        return new ResponseEntity<>(transactionsResponse,HttpStatus.OK);
+        HttpStatus httpStatus=transactionsResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(transactionsResponse,httpStatus);
     }
     @PutMapping("/amount/transfer")
     public ResponseEntity<TransactionsResponse> moneyTransfer(@Valid @PathParam("senderAccountNumber") Integer senderAccountNumber, @PathParam("receiverAccountNumber") Integer receiverAccountNumber, @PathParam("amount") Double amount) {
     TransactionsResponse transactionsResponse =transactionServices.transferAmount(senderAccountNumber, receiverAccountNumber, amount);
-        return new ResponseEntity<>(transactionsResponse,HttpStatus.OK);
+    HttpStatus httpStatus=transactionsResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(transactionsResponse,httpStatus);
     }
 
 }

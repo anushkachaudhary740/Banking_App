@@ -1,5 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 
+import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
@@ -20,7 +21,6 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,20 +33,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = CustomerController.class)
 class CustomerControllerTest {
     @MockBean
+    private CustomerRepo customerRepo;
+    @MockBean
     private CustomerServices customerServices;
-//use to call REST APIs
+    //use to call REST APIs
     @Autowired
     private MockMvc mockMvc;
-//used to convert object into JSON
+    //used to convert object into JSON
     @Autowired
     private ObjectMapper objectMapper;
     private CustomerDto customerDto;
+
     @BeforeEach
     void setUp(){
         customerDto = CustomerDto.builder()
-                .customerId(101)
+                .customerId(1)
                 .customerName("Anushka Chaudhary")
-                .gender("female")
+                .customerGender("female")
                 .customerMobileNumber("1234567890")
                 .customerPanCardNumber("C123D8790")
                 .customerAadharCardNumber("1234 5678 9870")
@@ -59,16 +62,15 @@ class CustomerControllerTest {
     void createCustomer() throws Exception {
         given(customerServices.createNewCustomer(any(CustomerDto.class)))
                 .willAnswer((e)-> e.getArgument(0));
-        // when -  action or the behaviour that we are going test
-        ResultActions response = mockMvc.perform(post("/customer/create")
+        mockMvc.perform(post("/customer/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customerDto)));
-        //then - verify
-        response.andDo(print())
+                .content(objectMapper.writeValueAsString(customerDto)))
+                .andDo(print())
                 .andExpect(jsonPath("$.customerId", is(customerDto.getCustomerId())))
                 .andExpect(jsonPath("$.customerName", is(customerDto.getCustomerName())))
-                .andExpect(jsonPath("$.gender", is(customerDto.getGender())));
+                .andReturn();
     }
+
 
     @Test
     void getCustomerDetails() throws Exception {
@@ -81,6 +83,15 @@ class CustomerControllerTest {
                         is(listOfAccount.size())));
     }
     @Test
+    void getCustomerDetailsWithNegativeScenarioIfCustomerDetailsNotFound() throws Exception {
+        List<CustomerDto> listOfAccount = new ArrayList<>();
+        given(customerServices.findAllCustomerDetails()).willReturn(List.of());
+        ResultActions response = mockMvc.perform(get("/customer/get"));
+        response.andExpect(status().isNotFound())
+                .andReturn();
+
+    }
+    @Test
     void findCustomerDetailsById() throws Exception {
         Integer customerId = 501;
         given(customerServices.getCustomerById(customerId)).willReturn(Optional.ofNullable(customerDto));
@@ -91,36 +102,59 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.customerName", is(customerDto.getCustomerName())))
                 .andExpect(jsonPath("$.customerEmail", is(customerDto.getCustomerEmail())));
     }
-
     @Test
-    void updateAccountDetails() throws Exception {
+    void findCustomerDetailsByIdWithNegativeScenarioIfIdNotExist() throws Exception {
+        Integer customerId = 51;
+        given(customerServices.getCustomerById(customerId)).willReturn(Optional.empty());
+        ResultActions response = mockMvc.perform(get("/customer/get/{customerId}", customerId));
+        response.andExpect(status().isNotFound())
+                .andReturn();
+                 }
+    @Test
+    void updateCustomerDetails() throws Exception {
+        Integer customerId=1;
         CustomerDto updatedCustomerDto = CustomerDto.builder()
                 .customerName("Anu Chaudhary")
-                .gender("female")
+                .customerGender("female")
                 .customerMobileNumber("7408336672")
                 .customerPanCardNumber("C123D8790")
                 .customerAadharCardNumber("1234 5678 9870")
                 .customerEmail("anushka@gmail.com")
                 .customerDateOfBirth("2000/20000/2000")
                 .build();
-        given(customerServices.getCustomerById(customerDto.getCustomerId())).willReturn(Optional.ofNullable(customerDto));
-        given(customerServices.updateCustomerDetails(any(CustomerDto.class)))
-                .willAnswer((invocation)-> invocation.getArgument(0));
-        // when -  action or the behaviour that we are going test
-        ResultActions response = mockMvc.perform(put("/customer/update/{customerId}",customerDto.getCustomerId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedCustomerDto)));
-        //then - verify
+        CustomerResponse customerResponse=new CustomerResponse("Customer details updated successfully",true);
+        when(customerServices.updateCustomerDetails(updatedCustomerDto,customerId)).thenReturn(customerResponse);
+        ResultActions response = mockMvc.perform(put("/customer/update/{customerId}",customerId)
+               .contentType(MediaType.APPLICATION_JSON)
+               .content(objectMapper.writeValueAsString(customerResponse)));
         response.andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.customerName", is(updatedCustomerDto.getCustomerName())))
-                .andExpect(jsonPath("$.customerEmail", is(updatedCustomerDto.getCustomerEmail())));
+                .andDo(print());
+}
+    @Test
+    void updateCustomerDetailsWithNegativeScenarioIfIdNotExist() throws Exception {
+        Integer customerId=78;
+        CustomerDto updatedCustomerDto = CustomerDto.builder()
+                .customerName("Anu Chaudhary")
+                .customerGender("female")
+                .customerMobileNumber("7408336672")
+                .customerPanCardNumber("C123D8790")
+                .customerAadharCardNumber("1234 5678 9870")
+                .customerEmail("anushka@gmail.com")
+                .customerDateOfBirth("2000/20000/2000")
+                .build();
+        CustomerResponse customerResponse=new CustomerResponse("Customer Id dose not exist",false);
+        when(customerServices.updateCustomerDetails(updatedCustomerDto,customerId)).thenReturn(customerResponse);
+        ResultActions response = mockMvc.perform(put("/customer/update/{customerId}",customerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customerResponse)));
+        response.andDo(print())
+                .andReturn();
+                //.andExpect(jsonPath("$.message",is(customerResponse.getMessage())));
     }
-
     @Test
     void deleteCustomerDetailsById() throws Exception {
         CustomerResponse customerResponse=new CustomerResponse();
-        customerResponse.setMessage("Account deleted successfully..");
+        customerResponse.setMessage("Customer details deleted successfully..");
         customerResponse.setSuccess(true);
         Integer customerId= 101;
         when(customerServices.deleteCustomer(customerId)).thenReturn(customerResponse);
@@ -128,5 +162,18 @@ class CustomerControllerTest {
         response.andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.message",is(customerResponse.getMessage())));
+    }
+    @Test
+    void deleteCustomerDetailsByIdWithNegativeScenarioIfIdNotExist() throws Exception {
+        CustomerResponse customerResponse=new CustomerResponse();
+        customerResponse.setMessage("Customer Id does not exist");
+        customerResponse.setSuccess(false);
+        Integer customerId= 10;
+        when(customerServices.deleteCustomer(customerId)).thenReturn(customerResponse);
+        ResultActions response = mockMvc.perform(delete("/customer/delete/{customerId}",customerId));
+        response.andExpect(status().isNotFound())
+                .andDo(print())
+                .andExpect(jsonPath("$.message",is(customerResponse.getMessage())));
+
     }
 }

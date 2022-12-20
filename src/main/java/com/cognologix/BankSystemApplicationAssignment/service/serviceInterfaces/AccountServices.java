@@ -8,11 +8,10 @@ import java.util.Optional;
 
 @Service
 public interface AccountServices {
-    //void saveAccount(Account account);
     List<AccountDto> getAccountDetails();
     Optional<AccountDto> getAccountDetailsByNumber(Integer accountNumber);
     AccountDto createAccount(AccountDto account);
-    AccountDto updateAccount(AccountDto accountDto);
+    AccountResponse updateAccount(AccountDto accountDto,Integer accountNumber);
     AccountResponse getTotalBalance(Integer accountNumber);
     AccountResponse deleteAccount(Integer accountNumber);
 

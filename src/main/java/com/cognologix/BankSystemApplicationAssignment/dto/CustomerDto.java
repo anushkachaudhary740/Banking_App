@@ -22,8 +22,8 @@ public class CustomerDto {
 //    private String typeOfAccount;
 //    @NotNull
 //    private String bankName;
-    @NotNull
-    private String gender;
+   // @NotNull
+    private String customerGender;
     @NotNull
     private String customerMobileNumber;
     @NotNull

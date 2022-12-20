@@ -13,15 +13,32 @@ public class GlobalExceptionHandler {
             BaseResponse baseResponse = new BaseResponse(message, false);
             return new ResponseEntity<BaseResponse>(baseResponse, HttpStatus.NOT_FOUND);
         }
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Map<String, String>> handleMethodArgsNotValidException(MethodArgumentNotValidException ex) {
-//        Map<String, String> resp = new HashMap<>();
-//        ex.getBindingResult().getAllErrors().forEach((error) -> {
-//            String fieldName = ((FieldError) error).getField();
-//            String message = error.getDefaultMessage();
-//            resp.put(fieldName, message);
-//        });
-//
-//        return new ResponseEntity<Map<String, String>>(resp, HttpStatus.BAD_REQUEST);
-//   }
+        @ExceptionHandler(AccountAlreadyExistException.class)
+        public ResponseEntity<BaseResponse> accountAlreadyExistExceptionHandler(AccountAlreadyExistException acc){
+            String message=acc.getMessage();
+            BaseResponse baseResponse = new BaseResponse(message, false);
+            return new ResponseEntity<BaseResponse>(baseResponse, HttpStatus.NOT_FOUND);
+
+        }
+    @ExceptionHandler(CustomerNotFoundException.class)
+    public ResponseEntity<BaseResponse> customerNotFoundException(CustomerNotFoundException cus){
+        String message=cus.getMessage();
+        BaseResponse baseResponse = new BaseResponse(message, false);
+        return new ResponseEntity<BaseResponse>(baseResponse, HttpStatus.NOT_FOUND);
+
+    }
+    @ExceptionHandler(CustomerAlreadyExistException.class)
+    public ResponseEntity<BaseResponse> customerAlreadyExistException(CustomerAlreadyExistException cus){
+        String message=cus.getMessage();
+        BaseResponse baseResponse = new BaseResponse(message, false);
+        return new ResponseEntity<BaseResponse>(baseResponse, HttpStatus.NOT_FOUND);
+
+    }
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<BaseResponse> accountNotFoundException(AccountNotFoundException account){
+        String message=account.getMessage();
+        BaseResponse baseResponse = new BaseResponse(message, false);
+        return new ResponseEntity<BaseResponse>(baseResponse, HttpStatus.NOT_FOUND);
+
+    }
 }

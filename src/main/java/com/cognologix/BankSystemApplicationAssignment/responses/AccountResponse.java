@@ -1,15 +1,13 @@
 package com.cognologix.BankSystemApplicationAssignment.responses;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class AccountResponse {
         private String message;
-        private boolean success;
+        private Boolean success;
 
 }

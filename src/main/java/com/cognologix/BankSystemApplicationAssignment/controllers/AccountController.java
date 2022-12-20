@@ -1,6 +1,5 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
-import com.cognologix.BankSystemApplicationAssignment.responses.BaseResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,43 +24,40 @@ public class AccountController {
     @Autowired
     private AccountServices accountServices;
     @PostMapping("/create")
-    public ResponseEntity<AccountDto> saveAccount(@Valid @RequestBody AccountDto account){
-        AccountDto accountDto=accountServices.createAccount(account);
-        return new ResponseEntity<>(accountDto,HttpStatus.CREATED);
+    public ResponseEntity<AccountDto> createAccount( @RequestBody AccountDto accountDto){
+        AccountDto newAccountDto=accountServices.createAccount(accountDto);
+        return new ResponseEntity<>(newAccountDto,HttpStatus.CREATED);
     }
     @GetMapping("/get")
     public ResponseEntity<List<AccountDto>> getAccountDetails() {
         List<AccountDto> list=this.accountServices.getAccountDetails();
-        return new ResponseEntity<>(list,HttpStatus.OK);
+        HttpStatus status=list.size()>0?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(list,status);
     }
     @GetMapping("/get/{accountNumber}")
     public ResponseEntity<Optional<AccountDto>> findAccountDetailsById(@PathVariable("accountNumber") Integer accountNumber){
-        return ResponseEntity.ok(this.accountServices.getAccountDetailsByNumber(accountNumber));
+        Optional<AccountDto> accountDto=this.accountServices.getAccountDetailsByNumber(accountNumber);
+        HttpStatus status=accountDto.isPresent()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(accountDto,status);
     }
     @PutMapping("/update/{accountNumber}")
-    public ResponseEntity<?> updateAccountDetails(@Valid @RequestBody AccountDto accountDto,@PathVariable("accountNumber") Integer accountNumber){
-return accountServices.getAccountDetailsByNumber(accountNumber)
-                .map(savedAccount -> {
-                    savedAccount.setBankName(accountDto.getBankName());
-                    savedAccount.setTypeOfAccount(accountDto.getTypeOfAccount());
-                    savedAccount.setTotalAmount(accountDto.getTotalAmount());
-
-                    AccountDto accountDto1=accountServices.updateAccount(savedAccount);
-                    return new ResponseEntity<>(accountDto1, HttpStatus.OK);
-
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<AccountResponse> updateAccountDetails(@Valid @RequestBody AccountDto accountDto,@PathVariable("accountNumber") Integer accountNumber){
+        AccountResponse newAccountDto=accountServices.updateAccount(accountDto,accountNumber);
+        HttpStatus status=newAccountDto.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(newAccountDto,status);
 
     }
     @GetMapping("/amount/{accountNumber}")
     public ResponseEntity<AccountResponse> findTotalBalance(@PathVariable("accountNumber") Integer accountNumber){
         AccountResponse accountResponse=accountServices.getTotalBalance(accountNumber);
-        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+        HttpStatus status=accountResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(accountResponse, status);
     }
     @DeleteMapping("/delete/{accountNumber}")
     public ResponseEntity<AccountResponse> deleteAccountDetailsById(@PathVariable("accountNumber") Integer accountNumber){
         AccountResponse accountResponse=this.accountServices.deleteAccount(accountNumber);
-        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+        HttpStatus status=accountResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(accountResponse, status);
     }
 
 }

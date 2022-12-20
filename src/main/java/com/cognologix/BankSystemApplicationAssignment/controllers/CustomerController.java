@@ -31,33 +31,27 @@ public class CustomerController {
     }
     @GetMapping("/get")
     public ResponseEntity<List<CustomerDto>> getCustomerDetails() {
-        return  ResponseEntity.ok(this.customerServices.findAllCustomerDetails());
+        List<CustomerDto> customerDto=this.customerServices.findAllCustomerDetails();
+        HttpStatus httpStatus=customerDto.size()>0?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return  new ResponseEntity<>(customerDto,httpStatus);
     }
     @GetMapping("/get/{customerId}")
     public ResponseEntity<Optional<CustomerDto>> findCustomerDetailsById(@PathVariable("customerId") Integer customerId){
-        return ResponseEntity.ok(this.customerServices.getCustomerById(customerId));
+        Optional<CustomerDto> customerDto=this.customerServices.getCustomerById(customerId);
+        HttpStatus httpStatus=customerDto.isPresent()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(customerDto,httpStatus);
     }
     @PutMapping("/update/{customerId}")
-    public ResponseEntity<CustomerDto> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto, @PathVariable("customerId") Integer customerId){
-                 return customerServices.getCustomerById(customerId)
-                .map(e -> {
-
-                    e.setCustomerName(customerDto.getCustomerName());
-                    e.setCustomerEmail(customerDto.getCustomerEmail());
-                    e.setCustomerMobileNumber(customerDto.getCustomerMobileNumber());
-                    e.setCustomerDateOfBirth(customerDto.getCustomerDateOfBirth());
-                    e.setCustomerPanCardNumber(customerDto.getCustomerPanCardNumber());
-                    e.setCustomerAadharCardNumber(customerDto.getCustomerAadharCardNumber());
-                    CustomerDto customerDto1=customerServices.updateCustomerDetails(e);
-                    return new ResponseEntity<>( customerDto1,HttpStatus.OK);
-
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CustomerResponse> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto, @PathVariable("customerId") Integer customerId){
+        CustomerResponse customerResponse=this.customerServices.updateCustomerDetails(customerDto,customerId);
+        //HttpStatus httpStatus=customerResponse.getSuccess()==true?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(customerResponse,HttpStatus.OK);
     }
     @DeleteMapping("/delete/{customerId}")
     public ResponseEntity<CustomerResponse> deleteCustomerDetailsById(@PathVariable("customerId") Integer customerId){
         CustomerResponse customerResponse=this.customerServices.deleteCustomer(customerId);
-        return new ResponseEntity<>(customerResponse ,HttpStatus.OK);
+        HttpStatus httpStatus=customerResponse.getSuccess()==true?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(customerResponse ,httpStatus);
     }
 
 }
