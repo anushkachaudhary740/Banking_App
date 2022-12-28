@@ -1,20 +1,15 @@
-package com.cognologix.BankSystemApplicationAssignment.service.servicesimplementation;
+package com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation;
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
-import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountAlreadyExistException;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountNotFoundException;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.CustomerNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
 import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,10 +62,10 @@ public class AccountServicesImplementation implements AccountServices {
                 Account accountDetails = this.converter.accountDtoToModel(accountDto);
                 accountDetails.setAccountNumber(accountNumber);
                 this.accountRepo.save(accountDetails);
-                AccountResponse accountResponse = new AccountResponse("Account updated successfully", true);
+                AccountResponse accountResponse = new AccountResponse("Account updated successfully", true,accountDto);
                 return accountResponse;
             } else {
-                return new AccountResponse("Invalid account number", false);
+                return new AccountResponse("Invalid account number", false,null);
 
             }
         }
@@ -81,10 +76,10 @@ public class AccountServicesImplementation implements AccountServices {
                 Account Balance1 = list1.get();
                 Double totalBalance = Balance1.getTotalAmount();
                 this.converter.accountModelToDto(Optional.of(Balance1));
-                AccountResponse accountResponse = new AccountResponse("Total balance : " + totalBalance, true);
+                AccountResponse accountResponse = new AccountResponse("Total balance : " + totalBalance, true,null);
                 return accountResponse;
             } else {
-                return new AccountResponse("Invalid account number", false);
+                return new AccountResponse("Invalid account number", false,null);
 
             }
         }
@@ -92,10 +87,10 @@ public class AccountServicesImplementation implements AccountServices {
         public AccountResponse deleteAccount (Integer accountNumber){
             if (accountRepo.existsById(accountNumber)) {
                 this.accountRepo.deleteById(accountNumber);
-                AccountResponse accountResponse = new AccountResponse("Account deleted successfully..", true);
+                AccountResponse accountResponse = new AccountResponse("Account deleted successfully..", true,null);
                 return accountResponse;
             } else {
-                return new AccountResponse("Invalid account number", false);
+                return new AccountResponse("Invalid account number", false,null);
             }
         }
     }

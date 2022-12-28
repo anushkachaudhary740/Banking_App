@@ -94,7 +94,7 @@ void setUp(){
 
     @Test
     void depositAmount() throws Exception {
-        TransactionsResponse transactionsResponse =new TransactionsResponse("Rs 500.0 Successfully deposit.....",true);
+        TransactionsResponse transactionsResponse =new TransactionsResponse("Rs 500.0 Successfully deposit.....",true,transactionDto1);
         when(transactionServices.depositAmount(1,500.0)).thenReturn(transactionsResponse);
         ResultActions result = mockMvc.perform(
                 put("/transaction/deposit?accountNumber=1&depositAmount=500")
@@ -106,8 +106,8 @@ void setUp(){
                         .andReturn();
     }
     @Test
-    void depositAmountWithnegativeScenarioIfifAccountNotExist() throws Exception {
-        TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false);
+    void depositAmountWithNegativeScenarioIfAccountNotExist() throws Exception {
+        TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false,null);
         when(transactionServices.depositAmount(67,500.0)).thenReturn(transactionsResponse);
         ResultActions result = mockMvc.perform(
                 put("/transaction/deposit?accountNumber=67&depositAmount=500")
@@ -123,6 +123,7 @@ void setUp(){
         TransactionsResponse transactionsResponse =new TransactionsResponse();
         transactionsResponse.setMessage("Rs 20.0 successfully withdraw.....");
         transactionsResponse.setSuccess(true);
+        transactionsResponse.setTransaction(null);
         when(transactionServices.withdrawAmount(1,20.0)).thenReturn(transactionsResponse);
         ResultActions result = mockMvc.perform(
                 put("/transaction/withdraw?accountNumber=1&withdrawAmount=20")
@@ -135,7 +136,7 @@ void setUp(){
     }
     @Test
     void withdrawAmountWithNegativeScenarioIfAccountNotExist() throws Exception {
-        TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false);
+        TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false,null);
         when(transactionServices.withdrawAmount(90,20.0)).thenReturn(transactionsResponse);
         ResultActions result = mockMvc.perform(
                 put("/transaction/withdraw?accountNumber=90&withdrawAmount=20")
@@ -149,7 +150,7 @@ void setUp(){
 
     @Test
     void moneyTransfer() throws Exception {
-        TransactionsResponse transactionsResponse =new TransactionsResponse("Rs 40.0 successfully transfer.....",true);
+        TransactionsResponse transactionsResponse =new TransactionsResponse("Rs 40.0 successfully transfer.....",true,transactionDto1);
         when(transactionServices.transferAmount(2,1,40.0)).thenReturn(transactionsResponse);
         ResultActions result = mockMvc.perform(
                 put("/transaction/amount/transfer?senderAccountNumber=2&receiverAccountNumber=1&amount=40")
@@ -162,7 +163,7 @@ void setUp(){
         }
         @Test
     void moneyTransferWithNegativeScenarioIfAccountNotExist() throws Exception {
-            TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false);
+            TransactionsResponse transactionsResponse =new TransactionsResponse("Account does not exist",false,null);
             when(transactionServices.transferAmount(67,87,40.0)).thenReturn(transactionsResponse);
             ResultActions result = mockMvc.perform(
                     put("/transaction/amount/transfer?senderAccountNumber=67&receiverAccountNumber=87&amount=40")

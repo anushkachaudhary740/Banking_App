@@ -7,8 +7,11 @@ import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountAlreadyE
 import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,6 +33,9 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class AccountServicesTest {
+    // uses the Log4j 2 classes to create the Logger object
+    private static final Logger logger = LogManager.getLogger(AccountServicesTest.class);
+
     @Autowired
     private AccountServices accountServices;
     @MockBean
@@ -51,6 +57,7 @@ class AccountServicesTest {
         when(accountRepo.findAll()).thenReturn((List<Account>) Stream
                 .of(new Account( 3234,"Active","SBI Bank","Saving",20.00)).collect(Collectors.toList()));
         assertEquals(1, accountServices.getAccountDetails().size());
+        logger.info("size of account is: "+accountServices.getAccountDetails().size());
     }
     @Test
     void getAccountDetailsWithNegativeScenarioIfAccountIsEmpty(){
@@ -63,9 +70,9 @@ class AccountServicesTest {
     @Test
     void getAccountByNumber() {
         Account account=this.converter.accountDtoToModel(accountDto);
-        when(accountRepo.findById(12)).thenReturn(Optional.ofNullable(account));
-        AccountDto accountDto1=this.converter.accountModelToDto(Optional.ofNullable(account));
-        Optional<AccountDto> savedAccount = accountServices.getAccountDetailsByNumber(accountDto1.getAccountNumber());
+        when(accountRepo.existsById(1)).thenReturn(true);
+        when(accountRepo.findById(1)).thenReturn(Optional.ofNullable(account));
+        Optional<AccountDto> savedAccount = accountServices.getAccountDetailsByNumber(1);
         assertThat(savedAccount).isNotNull();
     }
     @Test
@@ -74,8 +81,10 @@ class AccountServicesTest {
         when(accountRepo.findById(12)).thenReturn(Optional.ofNullable(account));
         assertThrows(AccountNotFoundException.class,
                 ()->accountServices.getAccountDetailsByNumber(12));
+        logger.error("error is: AccountNotFoundException");
     }
     @Test
+    @DisplayName("create account")
     void createAccount() {
         AccountDto accountDto = AccountDto.builder()
                 .accountNumber(78)
@@ -148,7 +157,7 @@ void updateAccount(){
 
     @Test
     void getTotalBalance() {
-        AccountResponse accountResponse=new AccountResponse("Total balance : 6786.0",true);
+        AccountResponse accountResponse=new AccountResponse("Total balance : 6786.0",true,null);
         Integer accountNumber=1;
         AccountResponse newAccountResponse=accountServices.getTotalBalance(accountNumber);
         System.out.println(newAccountResponse);
@@ -156,7 +165,7 @@ void updateAccount(){
     }
     @Test
     void getTotalBalanceWithNegativeScenarioIfIdNotExist() {
-        AccountResponse accountResponse=new AccountResponse("Invalid account number", false);
+        AccountResponse accountResponse=new AccountResponse("Invalid account number", false,null);
         Integer accountNumber=67;
         AccountResponse newAccountResponse=accountServices.getTotalBalance(accountNumber);
         System.out.println(newAccountResponse);

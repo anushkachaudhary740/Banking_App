@@ -46,7 +46,7 @@ class CustomerServicesTest {
     void setUp(){
         customerDto = CustomerDto.builder()
                 .customerId(1)
-                .customerName("Anushka Chaudhary")
+                .customerName("Anu Chaudhary")
                 .customerGender("female")
                 .customerMobileNumber("1234567890")
                 .customerPanCardNumber("C123D8790")
@@ -67,9 +67,10 @@ class CustomerServicesTest {
 
     }
     @Test
-    void customer() {
+    void createNewCustomerWithNegativeScenarioIfCustomerAlreadyExist() {
         Customer customer=customerConverter.customerDtoToModel(customerDto);
-        when(customerRepo.findById(78)).thenReturn(Optional.of(customer));
+        when(customerRepo.existsById(1)).thenReturn(true);
+        when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
         when(customerRepo.save(customer)).thenReturn(customer);
         assertThrows(CustomerAlreadyExistException.class, () ->
                 customerServices.createNewCustomer(customerDto)
@@ -79,8 +80,11 @@ class CustomerServicesTest {
     @Test
     void getCustomerById() {
         Customer customer = this.customerConverter.customerDtoToModel(customerDto);
-        when(customerRepo.findById(199)).thenReturn(Optional.of(customer));
-        Optional<CustomerDto> savedUser = customerServices.getCustomerById(customerDto.getCustomerId());
+        when(customerRepo.existsById(1)).thenReturn(true);
+        when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
+        when(customerRepo.save(customer)).thenReturn(customer);
+        CustomerDto customerDto1=this.customerConverter.customerModelToDto(customer);
+        Optional<CustomerDto> savedUser = customerServices.getCustomerById(customerDto1.getCustomerId());
        assertThat(savedUser).isNotNull();
 }
 @Test

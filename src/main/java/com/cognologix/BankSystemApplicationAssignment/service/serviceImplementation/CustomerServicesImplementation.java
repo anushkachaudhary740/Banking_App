@@ -1,22 +1,18 @@
-package com.cognologix.BankSystemApplicationAssignment.service.servicesimplementation;
+package com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation;
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.CustomerRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.CustomerAlreadyExistException;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.CustomerNotFoundException;
-import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.model.Customer;
 import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,11 +27,17 @@ public class CustomerServicesImplementation implements CustomerServices {
     @Override
     public CustomerDto createNewCustomer(@Valid CustomerDto customerDto) {
         Customer customerDetails = this.customerConverter.customerDtoToModel(customerDto);
-        Optional<Optional<Customer>> customer= Optional.of(customerRepo.findById(customerDto.getCustomerId()));
-        if(customer.isPresent()){
+//        customerRepo.save(customerDetails);
+//        System.out.println(customerDetails.getAccount());
+  //      return this.customerConverter.customerModelToDto(customerDetails);
+        //Optional<Optional<Customer>> customer= Optional.of(customerRepo.findById(customerDetails.getCustomerId()));
+        if(customerRepo.existsById(customerDto.getCustomerId())){
             throw new CustomerAlreadyExistException("Customer","CustomerId",customerDetails.getCustomerId());
         }
-        return this.customerConverter.customerModelToDto(customerDetails);
+        else {
+            customerRepo.save(customerDetails);
+            return this.customerConverter.customerModelToDto(customerDetails);
+        }
     }
     @Override
     public Optional<CustomerDto> getCustomerById(Integer customerId) {
@@ -60,10 +62,10 @@ public class CustomerServicesImplementation implements CustomerServices {
         Customer customerDetails = this.customerConverter.customerDtoToModel(customerDto);
         customerDetails.setCustomerId(customerId);
         this.customerRepo.save(customerDetails);
-        return new CustomerResponse("Customer details updated successfully",true);
+        return new CustomerResponse("Customer details updated successfully",true,customerDto);
         }
         else {
-            return new CustomerResponse("Customer Id does not exist",false);
+            return new CustomerResponse("Customer Id does not exist",false,customerDto);
         }
 
     }
@@ -71,11 +73,11 @@ public class CustomerServicesImplementation implements CustomerServices {
     public CustomerResponse deleteCustomer(Integer customerId) {
         if(customerRepo.existsById(customerId)) {
             this.customerRepo.deleteById(customerId);
-            CustomerResponse customerResponse = new CustomerResponse("Customer details deleted successfully..", true);
+            CustomerResponse customerResponse = new CustomerResponse("Customer details deleted successfully..", true,null);
             return customerResponse;
         }
         else {
-            return new CustomerResponse("Customer Id does not exist",false);
+            return new CustomerResponse("Customer Id does not exist",false,null);
         }
     }
 

@@ -1,9 +1,8 @@
-package com.cognologix.BankSystemApplicationAssignment.service.servicesimplementation;
+package com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation;
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dao.TransactionsRepo;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
-import com.cognologix.BankSystemApplicationAssignment.exceptions.AccountNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.InSufficientBalanceException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
 import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
@@ -63,11 +62,11 @@ public class TransactionServicesImplementation implements TransactionServices {
              this.transactionsRepo.save(trans1);
              account.setTotalAmount(account.getTotalAmount() + depositAmount);
              this.accountRepo.save(account);
-             TransactionsResponse transactionsResponse =new TransactionsResponse("Rs "+depositAmount+" successfully deposit.....",true);
+             TransactionsResponse transactionsResponse =new TransactionsResponse("Rs "+depositAmount+" successfully deposit.....",true,trans);
              return transactionsResponse;
          }
          else {
-             TransactionsResponse transactionsResponse  =new TransactionsResponse("Account does not exist",false);
+             TransactionsResponse transactionsResponse  =new TransactionsResponse("Account does not exist",false,null);
              return transactionsResponse;
          }
     }
@@ -88,13 +87,13 @@ public class TransactionServicesImplementation implements TransactionServices {
                 this.transactionsRepo.save(trans1);
                 account.setTotalAmount(account.getTotalAmount() - withdrawAmount);
                 this.accountRepo.save(account);
-                TransactionsResponse transactionsResponse = new TransactionsResponse("Rs " + withdrawAmount + " successfully withdraw.....", true);
+                TransactionsResponse transactionsResponse = new TransactionsResponse("Rs " + withdrawAmount + " successfully withdraw.....", true,trans);
                 return transactionsResponse;
             } else {
                 throw new InSufficientBalanceException(" Insufficient Amount.....");
             }
         }else {
-            return new TransactionsResponse("Account does not exist",false);
+            return new TransactionsResponse("Account does not exist",false,null);
         }
     }
     @Override
@@ -122,10 +121,10 @@ public class TransactionServicesImplementation implements TransactionServices {
             this.transactionsRepo.save(trans1);
             account1.setTotalAmount(account1.getTotalAmount() + amount);
             this.accountRepo.save(account1);
-            TransactionsResponse transactionsResponse = new TransactionsResponse("Rs " + amount + " successfully transfer.....", true);
+            TransactionsResponse transactionsResponse = new TransactionsResponse("Rs " + amount + " successfully transfer.....", true,trans);
             return transactionsResponse;
         }else{
-            return new TransactionsResponse("Account does not exist",false);
+            return new TransactionsResponse("Account does not exist",false,null);
         }
 
     }

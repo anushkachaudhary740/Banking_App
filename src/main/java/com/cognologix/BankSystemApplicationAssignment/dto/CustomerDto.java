@@ -36,5 +36,5 @@ public class CustomerDto {
     private String customerDateOfBirth;
     private String address;
     private String pinCode;
-    private List<AccountDto> accountDetails;
+    private List<AccountDto> account;
 }

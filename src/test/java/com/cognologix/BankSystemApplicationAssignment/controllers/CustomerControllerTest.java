@@ -122,7 +122,7 @@ class CustomerControllerTest {
                 .customerEmail("anushka@gmail.com")
                 .customerDateOfBirth("2000/20000/2000")
                 .build();
-        CustomerResponse customerResponse=new CustomerResponse("Customer details updated successfully",true);
+        CustomerResponse customerResponse=new CustomerResponse("Customer details updated successfully",true,customerDto);
         when(customerServices.updateCustomerDetails(updatedCustomerDto,customerId)).thenReturn(customerResponse);
         ResultActions response = mockMvc.perform(put("/customer/update/{customerId}",customerId)
                .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ class CustomerControllerTest {
                 .customerEmail("anushka@gmail.com")
                 .customerDateOfBirth("2000/20000/2000")
                 .build();
-        CustomerResponse customerResponse=new CustomerResponse("Customer Id dose not exist",false);
+        CustomerResponse customerResponse=new CustomerResponse("Customer Id dose not exist",false,null);
         when(customerServices.updateCustomerDetails(updatedCustomerDto,customerId)).thenReturn(customerResponse);
         ResultActions response = mockMvc.perform(put("/customer/update/{customerId}",customerId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -156,6 +156,7 @@ class CustomerControllerTest {
         CustomerResponse customerResponse=new CustomerResponse();
         customerResponse.setMessage("Customer details deleted successfully..");
         customerResponse.setSuccess(true);
+        customerResponse.setCustomer(null);
         Integer customerId= 101;
         when(customerServices.deleteCustomer(customerId)).thenReturn(customerResponse);
         ResultActions response = mockMvc.perform(delete("/customer/delete/{customerId}",customerId));
@@ -168,6 +169,7 @@ class CustomerControllerTest {
         CustomerResponse customerResponse=new CustomerResponse();
         customerResponse.setMessage("Customer Id does not exist");
         customerResponse.setSuccess(false);
+        customerResponse.setCustomer(null);
         Integer customerId= 10;
         when(customerServices.deleteCustomer(customerId)).thenReturn(customerResponse);
         ResultActions response = mockMvc.perform(delete("/customer/delete/{customerId}",customerId));

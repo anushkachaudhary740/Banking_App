@@ -43,8 +43,8 @@ public class AccountController {
     @PutMapping("/update/{accountNumber}")
     public ResponseEntity<AccountResponse> updateAccountDetails(@Valid @RequestBody AccountDto accountDto,@PathVariable("accountNumber") Integer accountNumber){
         AccountResponse newAccountDto=accountServices.updateAccount(accountDto,accountNumber);
-        HttpStatus status=newAccountDto.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
-        return new ResponseEntity<>(newAccountDto,status);
+        //HttpStatus status=newAccountDto.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(newAccountDto,HttpStatus.OK);
 
     }
     @GetMapping("/amount/{accountNumber}")

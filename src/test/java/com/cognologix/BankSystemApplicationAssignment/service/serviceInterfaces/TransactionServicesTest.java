@@ -3,15 +3,11 @@ package com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces
 import com.cognologix.BankSystemApplicationAssignment.converter.Converter;
 import com.cognologix.BankSystemApplicationAssignment.dao.AccountRepo;
 import com.cognologix.BankSystemApplicationAssignment.dao.TransactionsRepo;
-import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
-import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
 import com.cognologix.BankSystemApplicationAssignment.exceptions.ResourceNotFoundException;
 import com.cognologix.BankSystemApplicationAssignment.model.Account;
-import com.cognologix.BankSystemApplicationAssignment.model.Customer;
 import com.cognologix.BankSystemApplicationAssignment.model.Transaction;
 import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -43,10 +37,7 @@ class TransactionServicesTest {
     @MockBean
     private AccountRepo accountRepo;
     private Account account;
-    //    @Autowired
     private Account account1;
-
-    //private TransactionsResponse transactionsResponse;
     @BeforeEach
     void setUp() {
         transactionDto = TransactionDto.builder()
