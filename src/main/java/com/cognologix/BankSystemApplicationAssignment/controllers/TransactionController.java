@@ -1,8 +1,8 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
+import com.cognologix.BankSystemApplicationAssignment.responses.AllTransactionsResponse;
 import com.cognologix.BankSystemApplicationAssignment.responses.TransactionsResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.TransactionServices;
 import com.cognologix.BankSystemApplicationAssignment.dto.TransactionDto;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +23,10 @@ import java.util.Optional;
 public class TransactionController {
     @Autowired
     private TransactionServices transactionServices;
-    @GetMapping("/get")
-    public ResponseEntity<List<TransactionDto>> getTransactionDetails() {
-        List<TransactionDto> list=this.transactionServices.getTransactionDetails();
-        HttpStatus httpStatus=list.size()>0?HttpStatus.OK:HttpStatus.NOT_FOUND;
+    @GetMapping("/account/{accountNumber}")
+    public ResponseEntity<AllTransactionsResponse> getTransactionDetails(@PathVariable("accountNumber") Integer accountNumber) {
+        AllTransactionsResponse list=this.transactionServices.getAllTransactionDetailsForOneAccount(accountNumber);
+        HttpStatus httpStatus=list.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
         return new ResponseEntity<>(list,httpStatus);
     }
     @GetMapping("/get/{transactionId}")

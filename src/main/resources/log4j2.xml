@@ -1,18 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %msg%n"/>
+            <PatternLayout
+                    pattern="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} %highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} %style{${sys:PID}}{magenta} [%15.15t] %style{%-40.40C{1.}}{cyan} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
         </Console>
-        <File name="LogToFile" fileName="logs/bankApp.log">
+
+        <RollingFile name="AccountFile" fileName="log/accountFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/accountFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="CustomerFile" fileName="log/customerFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/customerFile-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
             </PatternLayout>
-        </File>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="TransactionFile" fileName="log/transactionFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/transactionFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L [PID:%pid] - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="AccountTestingFile" fileName="log/accountTestingFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/accountTestingFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="CustomerTestingFile" fileName="log/customerTestingFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/customerTestingFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="TransactionTestingFile" fileName="log/transactionTestingFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/transactionTestingFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="AccountExceptionFile" fileName="log/accountExceptionFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/exceptionFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="CustomerExceptionFile" fileName="log/customerExceptionFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/exceptionFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="TransactionExceptionFile" fileName="log/transactionExceptionFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/exceptionFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="GlobalExceptionFile" fileName="log/globalExceptionFile.log"
+                     filePattern="logs/$${date:yyyy-MM}/exceptionFile-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %c:%L - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="info">
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation.AccountServicesImplementation"
+                level="INFO" additivity="false">
+            <AppenderRef ref="AccountFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.AccountController" level="INFO"
+                additivity="false">
+            <AppenderRef ref="AccountFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.exceptions" level="INFO"
+                additivity="false">
+            <AppenderRef ref="AccountFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServicesTest"
+                level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AccountTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.AccountControllerTest"
+                level="DEBUG" additivity="false">
+            <AppenderRef ref="AccountTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.CustomerController" level="INFO"
+                additivity="false">
+            <AppenderRef ref="CustomerFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation.CustomerServicesImplementation"
+                level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="CustomerFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServicesTest"
+                level="DEBUG" additivity="false">
+            <AppenderRef ref="CustomerTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.CustomerControllerTest"
+                level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="CustomerTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.TransactionController" level="INFO"
+                additivity="false">
+            <AppenderRef ref="TransactionFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceImplementation.TransactionServicesImplementation"
+                level="INFO" additivity="false">
+            <AppenderRef ref="TransactionFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.TransactionServicesTest" level="DEBUG"
+                additivity="false">
+            <AppenderRef ref="TransactionTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.controllers.TransactionControllerTest" level="DEBUG"
+                additivity="false">
+            <AppenderRef ref="TransactionTestingFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.exceptions.exceptionHandler.AccountExceptionHandler" level="INFO"
+                additivity="false">
+            <AppenderRef ref="AccountExceptionFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.exceptions.exceptionHandler.CustomerExceptionHandler" level="INFO"
+                additivity="false">
+            <AppenderRef ref="CustomerExceptionFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.exceptions.exceptionHandler.TransactionExceptionHandler" level="INFO"
+                additivity="false">
+            <AppenderRef ref="TransactionExceptionFile"/>
+        </Logger>
+        <Logger name="com.cognologix.BankSystemApplicationAssignment.exceptions.exceptionHandler.CustomerExceptionHandler" level="INFO"
+                additivity="false">
+            <AppenderRef ref="CustomerExceptionFile"/>
+        </Logger>
+        <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
+
     </Loggers>
 </Configuration>

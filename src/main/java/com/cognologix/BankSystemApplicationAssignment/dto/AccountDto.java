@@ -12,6 +12,8 @@ import lombok.Setter;
 @Builder
 public class AccountDto {
     private Integer accountNumber;
+    private Integer customerId;
+    private String accountHolderName;
     private String accountStatus;
     private String bankName;
     private String typeOfAccount;

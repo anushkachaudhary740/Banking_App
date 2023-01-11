@@ -1,4 +1,4 @@
-package com.cognologix.BankSystemApplicationAssignment.exceptions;
+package com.cognologix.BankSystemApplicationAssignment.exceptions.globalException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,5 +11,8 @@ public class ResourceNotFoundException extends RuntimeException{
     long fieldValue;
     public ResourceNotFoundException(String resourceName, String fieldName, long fieldValue) {
         super(String.format("%s not found with %s : %s", resourceName,fieldName,fieldValue));
+    }
+    public ResourceNotFoundException(){
+        super();
     }
 }

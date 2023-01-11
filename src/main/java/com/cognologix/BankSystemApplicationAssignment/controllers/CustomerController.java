@@ -1,6 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 import com.cognologix.BankSystemApplicationAssignment.dto.CustomerDto;
-import com.cognologix.BankSystemApplicationAssignment.responses.BaseResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.AllAccountsForACustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.responses.CustomerResponse;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.CustomerServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,9 @@ public class CustomerController {
     @Autowired
     private CustomerServices customerServices;
     @PostMapping("/create")
-    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody CustomerDto customerDto){
-        CustomerDto createCustomerDto=customerServices.createNewCustomer(customerDto);
-        return new ResponseEntity<CustomerDto>(createCustomerDto, HttpStatus.CREATED);
+    public ResponseEntity<CustomerResponse> createCustomer(@Valid @RequestBody CustomerDto customerDto){
+        CustomerResponse createCustomerDto=customerServices.createNewCustomer(customerDto);
+        return new ResponseEntity<>(createCustomerDto, HttpStatus.CREATED);
     }
     @GetMapping("/get")
     public ResponseEntity<List<CustomerDto>> getCustomerDetails() {
@@ -40,6 +40,12 @@ public class CustomerController {
         Optional<CustomerDto> customerDto=this.customerServices.getCustomerById(customerId);
         HttpStatus httpStatus=customerDto.isPresent()?HttpStatus.OK:HttpStatus.NOT_FOUND;
         return new ResponseEntity<>(customerDto,httpStatus);
+    }
+    @GetMapping("/accounts/{customerId}")
+    public ResponseEntity<AllAccountsForACustomerResponse> findAllAccountForACustomer(@PathVariable("customerId") Integer customerId){
+        AllAccountsForACustomerResponse account= this.customerServices.getAllAccountsForACustomer(customerId);
+        HttpStatus httpStatus=account.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(account,httpStatus);
     }
     @PutMapping("/update/{customerId}")
     public ResponseEntity<CustomerResponse> updateAccountDetails(@Valid @RequestBody CustomerDto customerDto, @PathVariable("customerId") Integer customerId){

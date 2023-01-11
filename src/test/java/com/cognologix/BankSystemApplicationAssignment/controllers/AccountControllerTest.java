@@ -1,12 +1,13 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
+import com.cognologix.BankSystemApplicationAssignment.enums.accountEnums.AccountMsgEnums;
+import com.cognologix.BankSystemApplicationAssignment.enums.errorCodeEnums.AccountErrors;
 import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountStatusResponce;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,8 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AccountController.class)
 @Log4j2
 class AccountControllerTest {
-    // uses the Log4j 2 classes to create the Logger object
-    private static final Logger logger = LogManager.getLogger(AccountControllerTest.class);
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -45,26 +44,28 @@ class AccountControllerTest {
 
     @Test
     void createAccount() throws Exception {
-        logger.info("Starting...");
+        log.info("Starting...");
         AccountDto accountDto = AccountDto.builder()
                 .accountNumber(28)
                 .bankName("sbi bank")
                 .typeOfAccount("saving")
                 .totalAmount(500.00)
                 .build();
-        when(accountServices.createAccount(accountDto)).thenReturn(accountDto);
+        AccountResponse accountResponse = new AccountResponse(AccountMsgEnums.CREATE_ACCOUNT.getMessage(), true,accountDto);
+        when(accountServices.createAccount(accountDto)).thenReturn(accountResponse);
 
         ResultActions response = mockMvc.perform(post("/account/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)));
         response.andExpect(status().isCreated())
                 .andReturn();
-        logger.info(accountDto.getAccountNumber());
-        logger.info("Completed...");
+        log.info(accountDto.getAccountNumber());
+        log.info("Completed createAccount testing...");
     }
 
     @Test
     void getAccountDetails() throws Exception {
+
         List<AccountDto> listOfAccount = new ArrayList<>();
         listOfAccount.add(AccountDto.builder().accountNumber(12).bankName("HDFC Bank").typeOfAccount("saving").totalAmount(567.00).build());
         listOfAccount.add(AccountDto.builder().accountNumber(23).bankName("SBI Bank").typeOfAccount("current").totalAmount(600.00).build());
@@ -72,7 +73,7 @@ class AccountControllerTest {
         ResultActions response = mockMvc.perform(get("/account/get"));
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(listOfAccount.size())));
-        logger.info("Size of list is: " + listOfAccount.size());
+        log.info("Size of list is: " + listOfAccount.size());
 
     }
 
@@ -83,7 +84,7 @@ class AccountControllerTest {
         ResultActions response = mockMvc.perform(get("/account/get"));
         response.andExpect(status().isNotFound())
                 .andReturn();
-        logger.info("Size of list is: " + listOfAccount.size());
+        log.error("Size of list is: " + listOfAccount.size());
 
     }
 
@@ -102,7 +103,7 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.bankName", is(accountDto.getBankName())))
                 .andExpect(jsonPath("$.typeOfAccount", is(accountDto.getTypeOfAccount())))
                 .andExpect(jsonPath("$.totalAmount", is(accountDto.getTotalAmount())));
-        logger.info("Bank Name: " + accountDto.getBankName() + ", type Of Account: " + accountDto.getTypeOfAccount() + ", Total Amount :" + accountDto.getTotalAmount());
+        log.info("Bank Name: " + accountDto.getBankName() + ", type Of Account: " + accountDto.getTypeOfAccount() + ", Total Amount :" + accountDto.getTotalAmount());
     }
 
     @Test
@@ -117,7 +118,7 @@ class AccountControllerTest {
 
     @Test
     void updateAccountDetails() throws Exception {
-        logger.info("Starting....");
+        log.info("Starting....");
         AccountDto accountDto = AccountDto.builder()
                 .accountNumber(1)
                 .bankName("sbi bank")
@@ -129,15 +130,15 @@ class AccountControllerTest {
                 .typeOfAccount("current")
                 .totalAmount(600.00)
                 .build();
-        AccountResponse accountResponse = new AccountResponse("Account updated successfully", true,accountDto);
+        AccountResponse accountResponse = new AccountResponse(AccountMsgEnums.UPDATE_ACCOUNT.getMessage(), true,accountDto);
         when(accountServices.updateAccount(updatedAccountDto, 1)).thenReturn(accountResponse);
         ResultActions response = mockMvc.perform(put("/account/update/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountResponse)));
         response.andExpect(status().isOk())
                 .andDo(print());
-        //logger.info(accountResponse.getAccount().getTypeOfAccount());
-        logger.info("Completed...");
+        log.info(accountResponse.getMessage());
+        log.info("Completed...");
     }
 
     @Test
@@ -149,7 +150,8 @@ class AccountControllerTest {
                 .totalAmount(600.00)
                 .accountStatus("Active")
                 .build();
-        AccountResponse accountResponse = new AccountResponse("Invalid account number", false, null);
+        AccountResponse accountResponse = new AccountResponse(AccountErrors.INVALID_ACCOUNT_NUMBER.getMessage(), false, null);
+        log.error(accountResponse.getMessage());
         when(accountServices.updateAccount(updatedAccountDto, 3)).thenReturn(accountResponse);
         ResultActions response = mockMvc.perform(put("/account/update/{accountNumber}", accountNumber)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +163,7 @@ class AccountControllerTest {
     @Test
     void deleteAccountDetailsById() throws Exception {
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setMessage("Account deleted successfully..");
+        accountResponse.setMessage(AccountMsgEnums.DELETE_ACCOUNT.getMessage());
         accountResponse.setSuccess(true);
         accountResponse.setAccount(null);
         Integer accountNumber = 12;
@@ -170,17 +172,18 @@ class AccountControllerTest {
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is(accountResponse.getMessage())))
                 .andReturn();
-        logger.info("Account is " + accountResponse.getAccount());
+        log.info(accountResponse.getMessage());
     }
 
     @Test
     void deleteAccountDetailsByIdWithNegativeScenarioIfIdNotExist() throws Exception {
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setMessage("Invalid account number");
+        accountResponse.setMessage(AccountErrors.INVALID_ACCOUNT_NUMBER.getMessage());
         accountResponse.setSuccess(false);
         accountResponse.setAccount(null);
         Integer accountNumber = 12;
         when(accountServices.deleteAccount(12)).thenReturn(accountResponse);
+        log.error(accountResponse.getMessage());
         ResultActions response = mockMvc.perform(delete("/account/delete/{accountNumber}", accountNumber));
         response.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(accountResponse.getMessage())))
@@ -190,7 +193,7 @@ class AccountControllerTest {
     @Test
     void findTotalBalance() throws Exception {
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setMessage("Total balance : 6786.0");
+        accountResponse.setMessage(AccountMsgEnums.AVAILABLE_BALANCE.getMessage()+" 6786.0");
         accountResponse.setSuccess(true);
         accountResponse.setAccount(null);
         Integer accountNumber = 1;
@@ -200,13 +203,13 @@ class AccountControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is(accountResponse.getMessage())))
                 .andReturn();
-        logger.info(accountResponse.getMessage());
+        log.info(accountResponse.getMessage());
     }
 
     @Test
     void findTotalBalanceWithNegativeScenarioIfIdNotExist() throws Exception {
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setMessage("Invalid account number");
+        accountResponse.setMessage(AccountErrors.INVALID_ACCOUNT_NUMBER.getMessage());
         accountResponse.setSuccess(false);
         accountResponse.setAccount(null);
         Integer accountNumber = 98;
@@ -216,7 +219,48 @@ class AccountControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.message", is(accountResponse.getMessage())))
                 .andReturn();
-        logger.info(accountResponse.getMessage());
+        log.error(accountResponse.getMessage());
+    }
+    @Test
+    void deactivateAccount() throws Exception {
+        Integer accountNumber = 100;
+        AccountStatusResponce deactivateAccountResponse = new AccountStatusResponce(AccountMsgEnums.DEACTIVATE_ACCOUNT.getMessage(), true);
+        log.info(deactivateAccountResponse.toString());
+        when(accountServices.deactivateAccount(accountNumber)).thenReturn(deactivateAccountResponse);
+        ResultActions response = mockMvc.perform(put("/account/deactivate/{accountNumber}",accountNumber));
+        response.andExpect(status().isOk())
+                .andDo(print());
+    }
+    @Test
+    void deactivateAccountWithNegativeScenarioIfAccountNumberNotExist() throws Exception {
+        Integer accountNumber = 100;
+        AccountStatusResponce deactivateAccountResponse = new AccountStatusResponce(AccountErrors.ACCOUNT_NOT_FOUND.getMessage() +" with Id : 100",false);
+        log.error(deactivateAccountResponse.toString());
+        when(accountServices.deactivateAccount(accountNumber)).thenReturn(deactivateAccountResponse);
+        ResultActions response = mockMvc.perform(put("/account/deactivate/{accountNumber}",accountNumber));
+        response.andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    void activateAccount() throws Exception {
+        Integer accountNumber = 100;
+        AccountStatusResponce activateAccountResponse = new AccountStatusResponce(AccountMsgEnums.ACTIVATED_ACCOUNT.getMessage(), true);
+        log.info(activateAccountResponse.toString());
+        when(accountServices.activateAccount(accountNumber)).thenReturn(activateAccountResponse);
+        ResultActions response = mockMvc.perform(put("/account/activate/{accountNumber}", accountNumber));
+        response.andExpect(status().isOk())
+                .andDo(print());
+    }
+    @Test
+    void activateAccountWithNegativeScenarioIfAccountNumberNotExist() throws Exception {
+        Integer accountNumber = 100;
+        AccountStatusResponce activateAccountResponse = new AccountStatusResponce(AccountErrors.ACCOUNT_NOT_FOUND.getMessage()+" with Id : 100", false);
+        log.error(activateAccountResponse.toString());
+        when(accountServices.activateAccount(accountNumber)).thenReturn(activateAccountResponse);
+        ResultActions response = mockMvc.perform(put("/account/activate/{accountNumber}", accountNumber));
+        response.andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
 }

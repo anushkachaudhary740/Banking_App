@@ -1,16 +1,17 @@
 package com.cognologix.BankSystemApplicationAssignment.responses;
 
+import com.cognologix.BankSystemApplicationAssignment.model.Transaction;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-public class BaseResponse {
+@Data
+public class AllTransactionsResponse {
     private String message;
     private Boolean success;
-    private Integer statusCode;
+    private List<Transaction> transaction;
+
 }

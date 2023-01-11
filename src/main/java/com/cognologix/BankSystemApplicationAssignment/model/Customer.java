@@ -60,9 +60,9 @@ import java.util.List;
         private String address;
         private String pinCode;
 
-        @OneToMany(targetEntity = Account.class,cascade = CascadeType.ALL)
-        @JoinColumn(name = "customerId",referencedColumnName = "customerId")
-        private List<Account> account;
+//        @OneToMany(targetEntity = Account.class,cascade = CascadeType.ALL)
+//        @JoinColumn(name = "customerId",referencedColumnName = "customerId")
+//        private List<Account> account;
 
         @Column(updatable = false)
         @Temporal(TemporalType.TIMESTAMP)

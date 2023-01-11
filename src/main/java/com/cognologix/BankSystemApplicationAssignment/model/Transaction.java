@@ -1,6 +1,7 @@
 package com.cognologix.BankSystemApplicationAssignment.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 @Entity
+@Builder
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -17,7 +17,6 @@ import java.time.LocalTime;
 @ToString
 @Builder
 public class TransactionDto {
-    private Integer transactionId;
     private Integer toAccountNumber;
     private Integer fromAccountNumber;
     private Double transferAmount;

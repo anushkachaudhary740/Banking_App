@@ -1,5 +1,6 @@
 package com.cognologix.BankSystemApplicationAssignment.controllers;
 import com.cognologix.BankSystemApplicationAssignment.responses.AccountResponse;
+import com.cognologix.BankSystemApplicationAssignment.responses.AccountStatusResponce;
 import com.cognologix.BankSystemApplicationAssignment.service.serviceInterfaces.AccountServices;
 import com.cognologix.BankSystemApplicationAssignment.dto.AccountDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class AccountController {
     @Autowired
     private AccountServices accountServices;
     @PostMapping("/create")
-    public ResponseEntity<AccountDto> createAccount( @RequestBody AccountDto accountDto){
-        AccountDto newAccountDto=accountServices.createAccount(accountDto);
+    public ResponseEntity<AccountResponse> createAccount( @RequestBody AccountDto accountDto){
+        AccountResponse newAccountDto=accountServices.createAccount(accountDto);
         return new ResponseEntity<>(newAccountDto,HttpStatus.CREATED);
     }
     @GetMapping("/get")
@@ -35,7 +36,7 @@ public class AccountController {
         return new ResponseEntity<>(list,status);
     }
     @GetMapping("/get/{accountNumber}")
-    public ResponseEntity<Optional<AccountDto>> findAccountDetailsById(@PathVariable("accountNumber") Integer accountNumber){
+    public ResponseEntity<Optional<AccountDto>> findAccountDetailsByCustomerId(@PathVariable("accountNumber") Integer accountNumber){
         Optional<AccountDto> accountDto=this.accountServices.getAccountDetailsByNumber(accountNumber);
         HttpStatus status=accountDto.isPresent()?HttpStatus.OK:HttpStatus.NOT_FOUND;
         return new ResponseEntity<>(accountDto,status);
@@ -58,6 +59,22 @@ public class AccountController {
         AccountResponse accountResponse=this.accountServices.deleteAccount(accountNumber);
         HttpStatus status=accountResponse.getSuccess()?HttpStatus.OK:HttpStatus.NOT_FOUND;
         return new ResponseEntity<>(accountResponse, status);
+    }
+    @PutMapping("/activate/{accountNumber}")
+    public ResponseEntity<AccountStatusResponce> activateAccount(@PathVariable("accountNumber") Integer accountNumber){
+        AccountStatusResponce activateAccountResponse = this.accountServices.activateAccount(accountNumber);
+        //LOGGER.info(activateAccountResponse.toString());
+        HttpStatus httpStatus = activateAccountResponse.getSuccess()?HttpStatus.OK:HttpStatus.BAD_REQUEST;
+        //LOGGER.info(httpStatus.toString());
+        return new ResponseEntity<>(activateAccountResponse,httpStatus);
+    }
+    @PutMapping("/deactivate/{accountNumber}")
+    public ResponseEntity<AccountStatusResponce> deactivateAccount(@PathVariable("accountNumber") Integer accountNumber){
+        AccountStatusResponce deactivateAccountResponse = this.accountServices.deactivateAccount(accountNumber);
+       // LOGGER.info(deactivateAccountResponse.toString());
+        HttpStatus httpStatus = deactivateAccountResponse.getSuccess()?HttpStatus.OK:HttpStatus.BAD_REQUEST;
+       // LOGGER.info(httpStatus.toString());
+        return new ResponseEntity<>(deactivateAccountResponse,httpStatus);
     }
 
 }
